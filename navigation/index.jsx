@@ -103,6 +103,6 @@ function BottomTabNavigator() {
 }
 
 // for use with tab bar icons, necessary
-function TabBarIcon() {
+function TabBarIcon(props) {
 	return <FontAwesome size={30} style={{ marginBottom: -3 }} {...props} />;
 }

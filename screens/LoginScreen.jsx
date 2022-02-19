@@ -31,12 +31,12 @@ const LoginScreen = () => {
 	const handleSignUp = () => {
 		auth
 			.createUserWithEmailAndPassword(email, password)
-			.then((userCredentials) => {
-				const user = userCredentials.user;
+			.then((response) => {
+				const user = response.user;
 				const data = {
 					id: user.uid,
 					email,
-					fullName: "Test Name",
+					fullName: "temp name",
 				};
 				const userRef = firebase.firestore().collection("users");
 				userRef.doc(user.uid).set(data);
@@ -48,26 +48,8 @@ const LoginScreen = () => {
 	const handleLogin = () => {
 		auth
 			.signInWithEmailAndPassword(email, password)
-			.then((userCredentials) => {
-				const user = userCredentials.user;
-				firebase
-					.firestore()
-					.collection("users")
-					.doc(user.uid)
-					.get()
-					.then((response) => {
-						if (!response) {
-							alert("User does not exist.");
-							return;
-						} else {
-							const name = response.data().fullName;
-							alert(name);
-						}
-					})
-					.catch((error) => {
-						alert(error);
-					});
-				console.log("Logged in with: " + user.email);
+			.then((response) => {
+				console.log("Logged in with: " + response.user.email);
 			})
 			.catch((error) => alert(error.message));
 	};
