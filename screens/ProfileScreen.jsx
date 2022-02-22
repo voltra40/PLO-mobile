@@ -1,108 +1,113 @@
-import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+	View,
+	TextInput,
+	KeyboardAvoidingView,
+} from "react-native";
 import { auth, firebase } from "../firebase";
 import { useNavigation } from "@react-navigation/native";
 
-// const ProfileScreen = () => {
-// 	const navigation = useNavigation();
+const ProfileScreen = () => {
+	// hooks for states
+	const [username, setUsername] = useState("");
+	const [editing, setEditing] = useState(false);
 
-// 	const handleSignOut = () => {
-// 		auth
-// 			.signOut()
-// 			.then(() => {
-// 				navigation.replace("Login");
-// 			})
-// 			.catch((error) => alert(error.message));
-// 	};
+	// firebase firestore collection
+	const user = auth.currentUser;
+	const userRef = firebase.firestore().collection("users").doc(user.uid);
 
-// 	return (
-// 		<View style={styles.container}>
-// 			<Text> Name: </Text>
-// 			<Text> Signed in as: {auth.currentUser?.email} </Text>
-// 			<View style={styles.buttonContainer}>
-// 				<TouchableOpacity style={styles.button} onPress={handleSignOut}>
-// 					<Text style={styles.buttonText}>Sign Out</Text>
-// 				</TouchableOpacity>
-// 			</View>
-// 		</View>
-// 	);
-// };
-
-// export default ProfileScreen;
-
-// const navigation = useNavigation();
-
-// const handleSignOut = () => {
-// 	auth
-// 		.signOut()
-// 		.then(() => {
-// 			navigation.replace("Login");
-// 		})
-// 		.catch((error) => alert(error.message));
-// };
-
-export default class ProfileScreen extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			name: "",
-			email: "",
-		};
-	}
-
-	async componentDidMount() {
-		await this.getUser();
-	}
-
-	// handleSignOut() {
-	// 	// const navigation = useNavigation();
-	// 	auth
-	// 		.signOut()
-	// 		.then(() => {
-	// 			useNavigation().replace("Login");
-	// 		})
-	// 		.catch((error) => alert(error.message));
-	// 	console.log("signing out 123");
-	// }
-
-	async getUser() {
-		const user = auth.currentUser;
-		const userRef = firebase.firestore().collection("users").doc(user.uid);
-
+	// this is componentDidMount
+	useEffect(() => {
+		// get user info
 		userRef
 			.get()
 			.then((response) => {
 				// check document exist
 				if (response.exists) {
-					// alert(response.data().fullName);
-					this.setState({
-						name: response.data().fullName,
-						email: response.data().email,
-					});
+					setUsername(response.data().fullName);
+					console.log("User's name: " + response.data().fullName);
 				} else {
-					alert("Document does not exist.");
 					console.log("Document does not exist.");
 				}
 			})
 			.catch((error) => {
 				alert(error);
 			});
-	}
+	}, []);
 
-	render() {
-		return (
-			<View style={styles.container}>
-				<Text> Name: {this.state.name} </Text>
-				<Text> Signed in as: {this.state.email} </Text>
+	// edit name
+	const editName = () => {
+		console.log("passing username: " + username);
+		userRef
+			.update({
+				fullName: username,
+			})
+			.then(() => {
+				console.log("username updated to: " + username);
+			})
+			.catch((error) => {
+				alert(error);
+			});
+	};
+
+	// sign out
+	const navigation = useNavigation();
+
+	const handleSignOut = () => {
+		auth
+			.signOut()
+			.then(() => {
+				navigation.replace("Login");
+				console.log("signing out");
+			})
+			.catch((error) => alert(error.message));
+	};
+
+	return (
+		<View style={styles.container}>
+			{editing ? (
 				<View style={styles.buttonContainer}>
-					<TouchableOpacity style={styles.button} onPress={this.handleSignOut}>
-						<Text style={styles.buttonText}>Sign Out</Text>
+					<TextInput
+						value={username}
+						onChangeText={(text) => setUsername(text)}
+						style={styles.input}
+					/>
+					<TouchableOpacity
+						onPress={() => {
+							editName();
+							setEditing(false);
+						}}
+						style={styles.button}
+					>
+						<Text style={styles.buttonText}>Save</Text>
 					</TouchableOpacity>
 				</View>
+			) : (
+				<View style={styles.buttonContainer}>
+					<Text> Name: {username} </Text>
+					<TouchableOpacity
+						onPress={() => setEditing(true)}
+						style={styles.button}
+					>
+						<Text style={styles.buttonText}>Edit</Text>
+					</TouchableOpacity>
+				</View>
+			)}
+
+			<View style={styles.buttonContainer}>
+				<Text> Signed in as: {auth.currentUser?.email} </Text>
+				<TouchableOpacity style={styles.button} onPress={handleSignOut}>
+					<Text style={styles.buttonText}>Sign Out</Text>
+				</TouchableOpacity>
 			</View>
-		);
-	}
-}
+		</View>
+	);
+};
+
+export default ProfileScreen;
 
 const styles = StyleSheet.create({
 	container: {
@@ -122,5 +127,11 @@ const styles = StyleSheet.create({
 	},
 	buttonText: {
 		color: "white",
+	},
+	input: {
+		backgroundColor: "white",
+		padding: 10,
+		borderRadius: 5,
+		margin: 5,
 	},
 });
