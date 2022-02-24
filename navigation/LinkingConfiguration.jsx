@@ -8,7 +8,7 @@ import { LinkingOptions } from "@react-navigation/native";
 import * as Linking from "expo-linking";
 
 const linking = {
-	prefixes: [Linking.makeUrl("/")],
+	prefixes: Linking.createURL("/"),
 	config: {
 		screens: {
 			Root: {
@@ -16,11 +16,6 @@ const linking = {
 					TabOne: {
 						screens: {
 							TabOneScreen: "one",
-						},
-					},
-					TabTwo: {
-						screens: {
-							TabTwoScreen: "two",
 						},
 					},
 				},

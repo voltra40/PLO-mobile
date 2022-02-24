@@ -41,6 +41,18 @@ const LoginScreen = () => {
 				const userRef = firebase.firestore().collection("users");
 				userRef.doc(user.uid).set(data);
 				console.log("Registered with: " + user.email);
+
+				// create bucket list
+				const bucketListRef = firebase
+					.firestore()
+					.collection("users")
+					.doc(user.uid)
+					.collection("bucket list")
+					.doc("my bucket list");
+				const bucketList = {
+					items: [],
+				};
+				bucketListRef.set(bucketList);
 			})
 			.catch((error) => alert(error.message));
 	};
