@@ -5,6 +5,9 @@ import {
 	View,
 	TouchableOpacity,
 	TextInput,
+	SafeAreaView,
+	ScrollView,
+	KeyboardAvoidingView,
 } from "react-native";
 import { auth, firebase } from "../firebase";
 
@@ -65,7 +68,7 @@ const BucketListScreen = () => {
 	};
 
 	return (
-		<View style={styles.container}>
+		<SafeAreaView style={styles.container}>
 			<Text style={styles.title}>Bucket List</Text>
 			<View style={styles.inputContainer}>
 				<TextInput
@@ -74,19 +77,17 @@ const BucketListScreen = () => {
 					onChangeText={(text) => setItem(text)}
 					style={styles.input}
 				/>
-			</View>
-			<View style={styles.buttonContainer}>
-				<TouchableOpacity onPress={addItem} style={styles.button}>
+				<TouchableOpacity onPress={addItem} style={styles.inputButton}>
 					<Text style={styles.buttonText}>Add</Text>
 				</TouchableOpacity>
 			</View>
-			{bucketList ? (
-				bucketList.map((item, index) => (
-					<View stle={styles.bucketListContainer} key={index}>
-						<Text>
-							{index + 1}: {item}
-						</Text>
-						<View style={styles.buttonContainer}>
+			<ScrollView style={styles.scrollView}>
+				{bucketList ? (
+					bucketList.map((item, index) => (
+						<View style={styles.bucketListItemContainer} key={index}>
+							<View style={styles.bucketListItem}>
+								<Text style={styles.bucketListItemText}> {item}</Text>
+							</View>
 							<TouchableOpacity
 								onPress={() => deleteItem(item)}
 								style={styles.deleteButton}
@@ -94,12 +95,12 @@ const BucketListScreen = () => {
 								<Text style={styles.buttonText}>Delete</Text>
 							</TouchableOpacity>
 						</View>
-					</View>
-				))
-			) : (
-				<Text> No items </Text>
-			)}
-		</View>
+					))
+				) : (
+					<Text> No items </Text>
+				)}
+			</ScrollView>
+		</SafeAreaView>
 	);
 };
 
@@ -109,32 +110,58 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		alignItems: "center",
-		justifyContent: "center",
+		backgroundColor: "white",
 	},
-	title: {},
-	bucketListContainer: {},
+	scrollView: {
+		flex: 1,
+		alignSelf: "stretch",
+	},
+	title: {
+		fontSize: 40,
+		fontWeight: "bold",
+		marginBottom: "20%",
+	},
+	bucketListItemContainer: {
+		flexDirection: "row",
+		marginBottom: "10%",
+		alignSelf: "center",
+		width: "80%",
+	},
+	bucketListItem: {
+		flex: 1,
+		marginRight: "5%",
+	},
+	bucketListItemText: {
+		fontSize: 20,
+	},
 	deleteButton: {
-		padding: 10,
+		marginLeft: "auto",
+		justifyContent: "center",
+		padding: 5,
 		borderRadius: 5,
-		backgroundColor: "black",
+		backgroundColor: "red",
 	},
 	inputContainer: {
+		flexDirection: "row",
+		marginBottom: "10%",
 		width: "80%",
 	},
 	input: {
-		backgroundColor: "white",
-		padding: 10,
-		borderRadius: 5,
-		margin: 5,
+		flex: 1,
+		padding: "5%",
+		borderWidth: 1,
+		borderTopLeftRadius: 5,
+		borderBottomLeftRadius: 5,
+	},
+	inputButton: {
+		marginLeft: "auto",
+		padding: "5%",
+		borderTopRightRadius: 5,
+		borderBottomRightRadius: 5,
+		backgroundColor: "black",
 	},
 	buttonContainer: {
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	button: {
-		padding: 10,
-		borderRadius: 5,
-		backgroundColor: "black",
+		marginLeft: "auto",
 	},
 	buttonText: {
 		color: "white",

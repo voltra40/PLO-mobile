@@ -8,7 +8,7 @@ import {
 	TextInput,
 	View,
 	TouchableOpacity,
-	GestureResponderEvent,
+	SafeAreaView,
 } from "react-native";
 import { auth, firebase } from "../firebase";
 
@@ -36,7 +36,7 @@ const LoginScreen = () => {
 				const data = {
 					id: user.uid,
 					email,
-					fullName: "temp name",
+					name: "",
 				};
 				const userRef = firebase.firestore().collection("users");
 				userRef.doc(user.uid).set(data);
@@ -53,6 +53,18 @@ const LoginScreen = () => {
 					items: [],
 				};
 				bucketListRef.set(bucketList);
+
+				// create habits
+				const habitsRef = firebase
+					.firestore()
+					.collection("users")
+					.doc(user.uid)
+					.collection("habits")
+					.doc("my habits");
+				const habits = {
+					"Make my bed": [],
+				};
+				habitsRef.set(habits);
 			})
 			.catch((error) => alert(error.message));
 	};
@@ -68,6 +80,7 @@ const LoginScreen = () => {
 
 	return (
 		<KeyboardAvoidingView style={styles.container} behavior="padding">
+			<Text style={styles.title}>PLO</Text>
 			<View style={styles.inputContainer}>
 				<TextInput
 					placeholder="Email"
@@ -100,26 +113,29 @@ export default LoginScreen;
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		justifyContent: "center",
 		alignItems: "center",
+		justifyContent: "center",
+	},
+	title: {
+		fontSize: 40,
+		fontWeight: "bold",
 	},
 	inputContainer: {
-		width: "80%",
+		marginTop: "10%",
 	},
 	input: {
 		backgroundColor: "white",
-		padding: 10,
 		borderRadius: 5,
 		margin: 5,
+		padding: "5%",
 	},
 	buttonContainer: {
-		marginTop: 20,
-		justifyContent: "center",
+		marginTop: "10%",
 		alignItems: "center",
 	},
 	button: {
-		marginTop: 10,
-		padding: 10,
+		margin: 5,
+		padding: "5%",
 		borderRadius: 5,
 		backgroundColor: "black",
 	},

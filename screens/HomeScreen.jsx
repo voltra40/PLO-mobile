@@ -18,21 +18,14 @@ export default class HomeScreen extends React.Component {
 		const user = auth.currentUser;
 		const userRef = firebase.firestore().collection("users").doc(user.uid);
 
-		userRef
-			.get()
-			.then((response) => {
-				// check document exist
-				if (response.exists) {
-					// alert(response.data().fullName);
-					this.setState({ name: response.data().fullName });
-				} else {
-					alert("Document does not exist.");
-					console.log("Document does not exist.");
-				}
-			})
-			.catch((error) => {
-				alert(error);
-			});
+		userRef.onSnapshot((response) => {
+			if (response.exists) {
+				this.setState({ name: response.data().name });
+			} else {
+				alert("Document does not exist.");
+				console.log("Document does not exist.");
+			}
+		});
 	}
 
 	render() {

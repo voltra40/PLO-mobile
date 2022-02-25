@@ -5,7 +5,6 @@ import {
 	TouchableOpacity,
 	View,
 	TextInput,
-	KeyboardAvoidingView,
 } from "react-native";
 import { auth, firebase } from "../firebase";
 import { useNavigation } from "@react-navigation/native";
@@ -27,8 +26,8 @@ const ProfileScreen = () => {
 			.then((response) => {
 				// check document exist
 				if (response.exists) {
-					setUsername(response.data().fullName);
-					console.log("User's name: " + response.data().fullName);
+					setUsername(response.data().name);
+					console.log("User's name: " + response.data().name);
 				} else {
 					console.log("Document does not exist.");
 				}
@@ -43,7 +42,7 @@ const ProfileScreen = () => {
 		console.log("passing username: " + username);
 		userRef
 			.update({
-				fullName: username,
+				name: username,
 			})
 			.then(() => {
 				console.log("username updated to: " + username);
@@ -64,6 +63,18 @@ const ProfileScreen = () => {
 				console.log("signing out");
 			})
 			.catch((error) => alert(error.message));
+	};
+
+	const deleteAccount = () => {
+		user
+			.delete()
+			.then(() => {
+				navigation.replace("Login");
+				console.log("user deleted");
+			})
+			.catch((error) => {
+				alert(error.message);
+			});
 	};
 
 	return (
@@ -103,6 +114,12 @@ const ProfileScreen = () => {
 					<Text style={styles.buttonText}>Sign Out</Text>
 				</TouchableOpacity>
 			</View>
+
+			<View style={styles.buttonContainer}>
+				<TouchableOpacity style={styles.deleteButton} onPress={deleteAccount}>
+					<Text style={styles.buttonText}>Delete Account</Text>
+				</TouchableOpacity>
+			</View>
 		</View>
 	);
 };
@@ -119,6 +136,11 @@ const styles = StyleSheet.create({
 		marginTop: 20,
 		justifyContent: "center",
 		alignItems: "center",
+	},
+	deleteButton: {
+		padding: 10,
+		borderRadius: 5,
+		backgroundColor: "red",
 	},
 	button: {
 		padding: 10,
