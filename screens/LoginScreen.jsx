@@ -61,9 +61,14 @@ const LoginScreen = () => {
 					.doc(user.uid)
 					.collection("habits")
 					.doc("my habits");
+
+				const bedData = [];
+				for (let i = 0; i < 31; i++) bedData.push(false);
+
 				const habits = {
-					"Make my bed": [],
+					Bed: bedData,
 				};
+
 				habitsRef.set(habits);
 			})
 			.catch((error) => alert(error.message));
