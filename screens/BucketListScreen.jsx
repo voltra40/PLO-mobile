@@ -7,12 +7,12 @@ import {
 	TextInput,
 	SafeAreaView,
 	ScrollView,
-	KeyboardAvoidingView,
+	Keyboard,
 } from "react-native";
 import { auth, firebase } from "../firebase";
 
 const BucketListScreen = () => {
-	const [bucketList, setBucketList] = useState();
+	const [bucketList, setBucketList] = useState([]);
 	const [item, setItem] = useState("");
 
 	// firebase firestore collection
@@ -45,8 +45,9 @@ const BucketListScreen = () => {
 				items: firebase.firestore.FieldValue.arrayUnion(item),
 			})
 			.then(() => {
-				// clear input
+				// clear input & dismiss keyboard
 				setItem("");
+				Keyboard.dismiss();
 				console.log("added to items");
 			})
 			.catch((error) => {
@@ -82,23 +83,19 @@ const BucketListScreen = () => {
 				</TouchableOpacity>
 			</View>
 			<ScrollView style={styles.scrollView}>
-				{bucketList ? (
-					bucketList.map((item, index) => (
-						<View style={styles.bucketListItemContainer} key={index}>
-							<View style={styles.bucketListItem}>
-								<Text style={styles.bucketListItemText}> {item}</Text>
-							</View>
-							<TouchableOpacity
-								onPress={() => deleteItem(item)}
-								style={styles.deleteButton}
-							>
-								<Text style={styles.buttonText}>Delete</Text>
-							</TouchableOpacity>
+				{bucketList.map((item, index) => (
+					<View style={styles.bucketListItemContainer} key={index}>
+						<View style={styles.bucketListItem}>
+							<Text style={styles.bucketListItemText}> {item}</Text>
 						</View>
-					))
-				) : (
-					<Text> No items </Text>
-				)}
+						<TouchableOpacity
+							onPress={() => deleteItem(item)}
+							style={styles.deleteButton}
+						>
+							<Text style={styles.buttonText}>Delete</Text>
+						</TouchableOpacity>
+					</View>
+				))}
 			</ScrollView>
 		</SafeAreaView>
 	);

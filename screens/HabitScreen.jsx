@@ -7,13 +7,16 @@ import {
 	TextInput,
 	SafeAreaView,
 	ScrollView,
+	Pressable,
+	Keyboard,
 } from "react-native";
 import { auth, firebase } from "../firebase";
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 
 const HabitScreen = () => {
 	// double array does not store habit type like "meditation"
-	const [habits, setHabits] = useState([]);
+	const [habits, setHabits] = useState({});
 	// seperate array of habit types
 	const [habitType, setHabitType] = useState([]);
 	// for creating a new habit
@@ -35,16 +38,18 @@ const HabitScreen = () => {
 			const habits = response.data();
 			setHabitType(Object.keys(habits));
 			setHabits(habits);
+			console.log(habits);
 		});
 	}, []);
 
 	const createHabit = () => {
 		const data = [];
 		for (let i = 0; i < 31; i++) data.push(false);
-
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 		habitRef
 			.update({ [habitName]: data })
 			.then(() => {
+				Keyboard.dismiss();
 				setHabitName("");
 				console.log("added new habit: ", habitName);
 			})
@@ -54,6 +59,7 @@ const HabitScreen = () => {
 	};
 
 	const check = (item, sIndex) => {
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 		// copy data
 		const newData = habits[item];
 		// change true to false; false to true
@@ -69,12 +75,26 @@ const HabitScreen = () => {
 			});
 	};
 
+	const deleteHabit = (habit) => {
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+		habitRef
+			.update({ [habit]: firebase.firestore.FieldValue.delete() })
+			.then(() => console.log(habit, "deleted"))
+			.catch((error) => {
+				alert(error.message);
+			});
+	};
+
 	function HabitTypeRows() {
 		const sortHabitTypes = habitType.sort();
 		return sortHabitTypes.map((habit, index) => (
-			<View style={styles.habitType} key={index}>
+			<Pressable
+				onLongPress={() => deleteHabit(habit)}
+				style={styles.habitType}
+				key={index}
+			>
 				<Text style={styles.habitTypeText}> {habit}</Text>
-			</View>
+			</Pressable>
 		));
 	}
 
@@ -123,11 +143,12 @@ const HabitScreen = () => {
 				<ScrollView style={styles.scrollView} horizontal={true}>
 					<View style={styles.grid}>
 						<View style={styles.row}>
-							{dates.map((date, index) => (
-								<View style={styles.dateBox} key={index}>
-									<Text style={styles.dateText}> {date} </Text>
-								</View>
-							))}
+							{JSON.stringify(habits) !== "{}" &&
+								dates.map((date, index) => (
+									<View style={styles.dateBox} key={index}>
+										<Text style={styles.dateText}> {date} </Text>
+									</View>
+								))}
 						</View>
 						<Rows />
 					</View>
