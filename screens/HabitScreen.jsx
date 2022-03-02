@@ -33,16 +33,8 @@ const HabitScreen = () => {
 	useEffect(() => {
 		habitRef.onSnapshot((response) => {
 			const habits = response.data();
-			// create array of arrays
-			let array = [];
-			let habit = [];
-			let habitTypeArray = [];
-			for (habit in habits) {
-				array.push(habits[habit]);
-				habitTypeArray.push(habit);
-			}
-			setHabits(array);
-			setHabitType(habitTypeArray);
+			setHabitType(Object.keys(habits));
+			setHabits(habits);
 		});
 	}, []);
 
@@ -61,20 +53,54 @@ const HabitScreen = () => {
 			});
 	};
 
-	const check = (index, sIndex) => {
-		const newData = habits[index];
-		// true to false; false to true
+	const check = (item, sIndex) => {
+		// copy data
+		const newData = habits[item];
+		// change true to false; false to true
 		newData[sIndex] = !newData[sIndex];
 
 		habitRef
-			.update({ [habitType[index]]: newData })
+			.update({ [item]: newData })
 			.then(() => {
-				console.log("updated", habitType[index], "habit on day", sIndex + 1);
+				console.log("updated", item, "habit on day", sIndex + 1);
 			})
 			.catch((error) => {
 				alert(error.message);
 			});
 	};
+
+	function HabitTypeRows() {
+		const sortHabitTypes = habitType.sort();
+		return sortHabitTypes.map((habit, index) => (
+			<View style={styles.habitType} key={index}>
+				<Text style={styles.habitTypeText}> {habit}</Text>
+			</View>
+		));
+	}
+
+	function Rows() {
+		const sortedHabits = Object.keys(habits)
+			.sort()
+			.reduce((obj, key) => {
+				obj[key] = habits[key];
+				return obj;
+			}, {});
+		return Object.keys(sortedHabits).map((item, index) => (
+			<View style={styles.row} key={index}>
+				{habits[item].map((value, sIndex) => (
+					<View style={styles.checkBox} key={sIndex}>
+						<TouchableOpacity onPress={() => check(item, sIndex)}>
+							{value ? (
+								<Ionicons name="checkmark" size={32} color="black" />
+							) : (
+								<Ionicons name="checkmark" size={32} color="white" />
+							)}
+						</TouchableOpacity>
+					</View>
+				))}
+			</View>
+		));
+	}
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -92,11 +118,7 @@ const HabitScreen = () => {
 			</View>
 			<View style={styles.containerColumn}>
 				<View style={styles.habitTypeContainer}>
-					{habitType.map((habit, index) => (
-						<View style={styles.habitType} key={index}>
-							<Text style={styles.habitTypeText}> {habit}</Text>
-						</View>
-					))}
+					<HabitTypeRows />
 				</View>
 				<ScrollView style={styles.scrollView} horizontal={true}>
 					<View style={styles.grid}>
@@ -107,21 +129,7 @@ const HabitScreen = () => {
 								</View>
 							))}
 						</View>
-						{habits.map((items, index) => (
-							<View style={styles.row} key={index}>
-								{items.map((subItem, sIndex) => (
-									<View style={styles.checkBox} key={sIndex}>
-										<TouchableOpacity onPress={() => check(index, sIndex)}>
-											{subItem ? (
-												<Ionicons name="checkmark" size={32} color="black" />
-											) : (
-												<Ionicons name="checkmark" size={32} color="white" />
-											)}
-										</TouchableOpacity>
-									</View>
-								))}
-							</View>
-						))}
+						<Rows />
 					</View>
 				</ScrollView>
 			</View>
