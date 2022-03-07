@@ -62,14 +62,17 @@ const LoginScreen = () => {
 					.collection("habits")
 					.doc("my habits");
 
-				// const bedData = [];
-				// for (let i = 0; i < 31; i++) bedData.push(false);
-
-				// const habits = {
-				// 	Bed: bedData,
-				// };
-
 				habitsRef.set({});
+
+				// create cryptos
+				const cryptoRef = firebase
+					.firestore()
+					.collection("users")
+					.doc(user.uid)
+					.collection("crypto")
+					.doc("my crypto");
+
+				cryptoRef.set({ cryptos: [] });
 			})
 			.catch((error) => alert(error.message));
 	};

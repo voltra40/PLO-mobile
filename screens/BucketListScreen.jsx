@@ -157,9 +157,6 @@ const styles = StyleSheet.create({
 		borderBottomRightRadius: 5,
 		backgroundColor: "black",
 	},
-	buttonContainer: {
-		marginLeft: "auto",
-	},
 	buttonText: {
 		color: "white",
 	},
