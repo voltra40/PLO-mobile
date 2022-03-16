@@ -22,8 +22,37 @@ const HabitScreen = () => {
 	// for creating a new habit
 	const [habitName, setHabitName] = useState("");
 
+	// JS date function
+	const d = new Date();
+
+	// get days in month
+	const daysInCurrentMonth = new Date(
+		d.getFullYear(),
+		d.getMonth() + 1,
+		0
+	).getDate();
+
+	// populate dates for habit calendar
 	const dates = [];
-	for (let i = 1; i <= 31; i++) dates.push(i);
+	for (let i = 1; i <= daysInCurrentMonth; i++) dates.push(i);
+
+	// get current month
+	let currentMonth = d.getMonth();
+	const months = [
+		"January",
+		"February",
+		"March",
+		"April",
+		"May",
+		"June",
+		"July",
+		"August",
+		"September",
+		"October",
+		"November",
+		"December",
+	];
+	console.log("month", months[currentMonth]);
 
 	const user = auth.currentUser;
 	const habitRef = firebase
@@ -31,20 +60,31 @@ const HabitScreen = () => {
 		.collection("users")
 		.doc(user.uid)
 		.collection("habits")
-		.doc("my habits");
+		//.doc("my habits");
+		.doc(months[currentMonth]);
 
 	useEffect(() => {
+		// check if exist (creates new month if month has passed)
 		habitRef.onSnapshot((response) => {
-			const habits = response.data();
-			setHabitType(Object.keys(habits));
-			setHabits(habits);
-			console.log(habits);
+			if (response.exists) {
+				console.log("habit ref exist for month:", months[currentMonth]);
+				const habits = response.data();
+				setHabitType(Object.keys(habits));
+				setHabits(habits);
+				console.log(habits);
+			} else {
+				console.log(
+					"creating new habit reference for month:",
+					months[currentMonth]
+				);
+				habitRef.set({});
+			}
 		});
 	}, []);
 
 	const createHabit = () => {
 		const data = [];
-		for (let i = 0; i < 31; i++) data.push(false);
+		for (let i = 0; i < daysInCurrentMonth; i++) data.push(false);
 		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 		habitRef
 			.update({ [habitName]: data })

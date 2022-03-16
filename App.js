@@ -5,13 +5,10 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "./screens/LoginScreen";
 import Navigation from "./navigation";
 import LinkingConfiguration from "./navigation/LinkingConfiguration";
-import { useState } from "react";
 
 const Stack = createNativeStackNavigator();
 
-export default function App(props) {
-	const [user, setUser] = useState();
-
+export default function App() {
 	return (
 		<SafeAreaProvider>
 			<NavigationContainer linking={LinkingConfiguration}>

@@ -9,15 +9,24 @@ import {
 	TouchableOpacity,
 	ScrollView,
 	Pressable,
+	RefreshControl,
 } from "react-native";
 import { auth, firebase } from "../firebase";
 import axios from "axios";
 import * as Haptics from "expo-haptics";
+import { useNavigation } from "@react-navigation/native";
+
+const wait = (timeout) => {
+	return new Promise((resolve) => setTimeout(resolve, timeout));
+};
 
 const CryptoScreen = () => {
 	const [cryptoList, setCryptoList] = useState([]);
 	const [crypto, setCrypto] = useState("");
 	const [cryptoPrices, setCryptoPrices] = useState([]);
+	const [refreshing, setRefreshing] = useState(false);
+
+	const navigation = useNavigation();
 
 	const user = auth.currentUser;
 	const cryptoRef = firebase
@@ -40,7 +49,7 @@ const CryptoScreen = () => {
 			console.log("state change");
 			prices();
 		}
-	}, [cryptoList]);
+	}, [cryptoList, refreshing]);
 
 	const addCrypto = () => {
 		if (crypto === "") return;
@@ -104,7 +113,9 @@ const CryptoScreen = () => {
 				let tempPrices = [];
 				for (let symbol in json) {
 					tempPrices.push(
-						json[symbol].quote.USD.price.toFixed(2).toLocaleString("en-US")
+						json[symbol].quote.USD.price >= 1
+							? json[symbol].quote.USD.price.toFixed(2).toLocaleString("en-US")
+							: json[symbol].quote.USD.price.toFixed(4).toLocaleString("en-US")
 					);
 				}
 				setCryptoPrices(tempPrices);
@@ -125,16 +136,29 @@ const CryptoScreen = () => {
 
 			return sortedCrypto.map((elem, index) => (
 				<View style={styles.row} key={index}>
-					<Pressable onLongPress={() => deleteCrypto(elem)} key={index}>
+					<Pressable
+						style={styles.cryptoTextContainer}
+						onLongPress={() => deleteCrypto(elem)}
+						key={index}
+					>
 						<Text style={styles.cryptoText}> {elem}</Text>
 					</Pressable>
-					<View>
-						<Text style={styles.cryptoText}> {cryptoPrices[index]} </Text>
+					<View style={styles.cryptoPriceTextContainer}>
+						<Text style={styles.cryptoPriceText}> ${cryptoPrices[index]} </Text>
 					</View>
 				</View>
 			));
 		}
 	}
+
+	const viewTransactions = () => {
+		navigation.replace("Transactions");
+	};
+
+	const onRefresh = React.useCallback(() => {
+		setRefreshing(true);
+		wait(500).then(() => setRefreshing(false));
+	}, []);
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -150,9 +174,22 @@ const CryptoScreen = () => {
 					<Text style={styles.buttonText}>Add</Text>
 				</TouchableOpacity>
 			</View>
-			<ScrollView style={styles.scrollView}>
+			<ScrollView
+				style={styles.scrollView}
+				refreshControl={
+					<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+				}
+			>
 				<CryptoList />
 			</ScrollView>
+			<View>
+				<TouchableOpacity
+					onPress={viewTransactions}
+					style={styles.transactionsButton}
+				>
+					<Text style={styles.buttonText}>View Transactions</Text>
+				</TouchableOpacity>
+			</View>
 		</SafeAreaView>
 	);
 };
@@ -177,12 +214,18 @@ const styles = StyleSheet.create({
 	row: {
 		flexDirection: "row",
 		alignSelf: "stretch",
-		justifyContent: "center",
+		// justifyContent: "center",
 	},
 	inputContainer: {
 		flexDirection: "row",
 		marginBottom: "10%",
 		width: "80%",
+	},
+	transactionsButton: {
+		padding: "5%",
+		borderRadius: 5,
+		backgroundColor: "black",
+		marginBottom: "5%",
 	},
 	input: {
 		flex: 1,
@@ -201,7 +244,17 @@ const styles = StyleSheet.create({
 	buttonText: {
 		color: "white",
 	},
+	cryptoTextContainer: {
+		marginLeft: "20%",
+		width: "40%",
+	},
+	cryptoPriceTextContainer: {},
 	cryptoText: {
+		textAlign: "left",
+		fontWeight: "bold",
+		fontSize: 20,
+	},
+	cryptoPriceText: {
 		fontSize: 20,
 	},
 });

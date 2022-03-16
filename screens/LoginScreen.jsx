@@ -8,7 +8,6 @@ import {
 	TextInput,
 	View,
 	TouchableOpacity,
-	SafeAreaView,
 } from "react-native";
 import { auth, firebase } from "../firebase";
 
@@ -53,16 +52,6 @@ const LoginScreen = () => {
 					items: [],
 				};
 				bucketListRef.set(bucketList);
-
-				// create habits
-				const habitsRef = firebase
-					.firestore()
-					.collection("users")
-					.doc(user.uid)
-					.collection("habits")
-					.doc("my habits");
-
-				habitsRef.set({});
 
 				// create cryptos
 				const cryptoRef = firebase
