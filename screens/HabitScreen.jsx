@@ -25,17 +25,6 @@ const HabitScreen = () => {
 	// JS date function
 	const d = new Date();
 
-	// get days in month
-	const daysInCurrentMonth = new Date(
-		d.getFullYear(),
-		d.getMonth() + 1,
-		0
-	).getDate();
-
-	// populate dates for habit calendar
-	const dates = [];
-	for (let i = 1; i <= daysInCurrentMonth; i++) dates.push(i);
-
 	// get current month
 	let currentMonth = d.getMonth();
 	const months = [
@@ -52,7 +41,21 @@ const HabitScreen = () => {
 		"November",
 		"December",
 	];
-	console.log("month", months[currentMonth]);
+
+	// for traversing months
+	const [currMonth, setCurrMonth] = useState(currentMonth);
+	console.log("currMonth:", months[currMonth]);
+
+	// get days in month
+	const daysInCurrentMonth = new Date(
+		d.getFullYear(),
+		currMonth + 1,
+		0
+	).getDate();
+
+	// populate dates for habit calendar
+	const dates = [];
+	for (let i = 1; i <= daysInCurrentMonth; i++) dates.push(i);
 
 	const user = auth.currentUser;
 	const habitRef = firebase
@@ -61,8 +64,9 @@ const HabitScreen = () => {
 		.doc(user.uid)
 		.collection("habits")
 		//.doc("my habits");
-		.doc(months[currentMonth]);
+		.doc(months[currMonth]);
 
+	// handle loading component
 	useEffect(() => {
 		// check if exist (creates new month if month has passed)
 		habitRef.onSnapshot((response) => {
@@ -71,7 +75,7 @@ const HabitScreen = () => {
 				const habits = response.data();
 				setHabitType(Object.keys(habits));
 				setHabits(habits);
-				console.log(habits);
+				// console.log(habits);
 			} else {
 				console.log(
 					"creating new habit reference for month:",
@@ -80,7 +84,7 @@ const HabitScreen = () => {
 				habitRef.set({});
 			}
 		});
-	}, []);
+	}, [currMonth]);
 
 	const createHabit = () => {
 		const data = [];
@@ -162,6 +166,17 @@ const HabitScreen = () => {
 		));
 	}
 
+	const decrementMonth = () => {
+		currMonth > 0
+			? setCurrMonth(currMonth - 1)
+			: Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+	};
+	const incrementMonth = () => {
+		currMonth < 11
+			? setCurrMonth(currMonth + 1)
+			: Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+	};
+
 	return (
 		<SafeAreaView style={styles.container}>
 			<Text style={styles.title}>Habits</Text>
@@ -172,8 +187,19 @@ const HabitScreen = () => {
 					onChangeText={(text) => setHabitName(text)}
 					style={styles.input}
 				/>
-				<TouchableOpacity onPress={createHabit} style={styles.inputButton}>
+				<TouchableOpacity style={styles.inputButton} onPress={createHabit}>
 					<Text style={styles.buttonText}>Add</Text>
+				</TouchableOpacity>
+			</View>
+			<View style={styles.leftAndRightRow}>
+				<TouchableOpacity style={styles.back} onPress={decrementMonth}>
+					<Ionicons name="arrow-back-outline" size={20} color="white" />
+				</TouchableOpacity>
+				<View style={styles.month}>
+					<Text style={styles.monthText}> {months[currMonth]} </Text>
+				</View>
+				<TouchableOpacity style={styles.forward} onPress={incrementMonth}>
+					<Ionicons name="arrow-forward-outline" size={20} color="white" />
 				</TouchableOpacity>
 			</View>
 			<View style={styles.containerColumn}>
@@ -217,7 +243,9 @@ const styles = StyleSheet.create({
 	habitTypeContainer: {
 		marginTop: 49,
 	},
-	scrollView: {},
+	scrollView: {
+		//marginRight: "2%",
+	},
 	row: {
 		flexDirection: "row",
 		alignSelf: "stretch",
@@ -250,10 +278,29 @@ const styles = StyleSheet.create({
 	habitTypeText: {
 		fontSize: 32,
 	},
+	leftAndRightRow: {
+		justifyContent: "space-evenly",
+		flexDirection: "row",
+		marginBottom: "5%",
+	},
+	back: {
+		backgroundColor: "black",
+		padding: 5,
+		borderRadius: 5,
+		justifyContent: "center",
+		//marginRight: "40%",
+	},
+	forward: {
+		backgroundColor: "black",
+		padding: 5,
+		borderRadius: 5,
+		justifyContent: "center",
+		//marginLeft: "40%",
+	},
 	inputContainer: {
 		flexDirection: "row",
-		marginBottom: "10%",
-		width: "80%",
+		marginBottom: "5%",
+		width: "95%",
 	},
 	input: {
 		flex: 1,
@@ -268,6 +315,15 @@ const styles = StyleSheet.create({
 		borderTopRightRadius: 5,
 		borderBottomRightRadius: 5,
 		backgroundColor: "black",
+	},
+	month: {
+		alignSelf: "stretch",
+		width: "80%",
+	},
+	monthText: {
+		fontWeight: "bold",
+		fontSize: 30,
+		textAlign: "center",
 	},
 	buttonText: {
 		color: "white",
