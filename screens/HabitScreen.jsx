@@ -21,6 +21,8 @@ const HabitScreen = () => {
 	const [habitType, setHabitType] = useState([]);
 	// for creating a new habit
 	const [habitName, setHabitName] = useState("");
+	// for adding habits
+	const [adding, setAdding] = useState(false);
 
 	// JS date function
 	const d = new Date();
@@ -87,6 +89,7 @@ const HabitScreen = () => {
 	}, [currMonth]);
 
 	const createHabit = () => {
+		if (habitName === "") return;
 		const data = [];
 		for (let i = 0; i < daysInCurrentMonth; i++) data.push(false);
 		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -100,6 +103,7 @@ const HabitScreen = () => {
 			.catch((error) => {
 				alert(error.message);
 			});
+		setAdding(false);
 	};
 
 	const check = (item, sIndex) => {
@@ -179,47 +183,68 @@ const HabitScreen = () => {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<Text style={styles.title}>Habits</Text>
-			<View style={styles.inputContainer}>
-				<TextInput
-					placeholder="add a habit"
-					value={habitName}
-					onChangeText={(text) => setHabitName(text)}
-					style={styles.input}
-				/>
-				<TouchableOpacity style={styles.inputButton} onPress={createHabit}>
-					<Text style={styles.buttonText}>Add</Text>
-				</TouchableOpacity>
-			</View>
-			<View style={styles.leftAndRightRow}>
-				<TouchableOpacity style={styles.back} onPress={decrementMonth}>
-					<Ionicons name="arrow-back-outline" size={20} color="white" />
-				</TouchableOpacity>
-				<View style={styles.month}>
-					<Text style={styles.monthText}> {months[currMonth]} </Text>
-				</View>
-				<TouchableOpacity style={styles.forward} onPress={incrementMonth}>
-					<Ionicons name="arrow-forward-outline" size={20} color="white" />
-				</TouchableOpacity>
-			</View>
-			<View style={styles.containerColumn}>
-				<View style={styles.habitTypeContainer}>
-					<HabitTypeRows />
-				</View>
-				<ScrollView style={styles.scrollView} horizontal={true}>
-					<View style={styles.grid}>
-						<View style={styles.row}>
-							{JSON.stringify(habits) !== "{}" &&
-								dates.map((date, index) => (
-									<View style={styles.dateBox} key={index}>
-										<Text style={styles.dateText}> {date} </Text>
-									</View>
-								))}
-						</View>
-						<Rows />
+			{/* <Text style={styles.title}>Habits</Text> */}
+			{adding ? (
+				<View
+					style={{ flex: 1, alignSelf: "stretch", justifyContent: "center" }}
+				>
+					<View style={styles.inputContainer}>
+						<TextInput
+							placeholder="add a habit"
+							value={habitName}
+							onChangeText={(text) => setHabitName(text)}
+							style={styles.input}
+						/>
+						<TouchableOpacity style={styles.inputButton} onPress={createHabit}>
+							<Text style={styles.buttonText}>Add</Text>
+						</TouchableOpacity>
 					</View>
-				</ScrollView>
-			</View>
+					<TouchableOpacity
+						style={styles.addHabitButton}
+						onPress={() => setAdding(false)}
+					>
+						<Ionicons name="close-outline" size={50} color="black" />
+					</TouchableOpacity>
+				</View>
+			) : (
+				<View style={{ flex: 1, alignSelf: "stretch", marginTop: "10%" }}>
+					<View style={styles.leftAndRightRow}>
+						<TouchableOpacity style={styles.back} onPress={decrementMonth}>
+							<Ionicons name="arrow-back-outline" size={20} color="white" />
+						</TouchableOpacity>
+						<View style={styles.month}>
+							<Text style={styles.monthText}> {months[currMonth]} </Text>
+						</View>
+						<TouchableOpacity style={styles.forward} onPress={incrementMonth}>
+							<Ionicons name="arrow-forward-outline" size={20} color="white" />
+						</TouchableOpacity>
+					</View>
+					<View style={styles.containerColumn}>
+						<View style={styles.habitTypeContainer}>
+							<HabitTypeRows />
+						</View>
+						<ScrollView style={styles.scrollView} horizontal={true}>
+							<View style={styles.grid}>
+								<View style={styles.row}>
+									{JSON.stringify(habits) !== "{}" &&
+										dates.map((date, index) => (
+											<View style={styles.dateBox} key={index}>
+												<Text style={styles.dateText}> {date} </Text>
+											</View>
+										))}
+								</View>
+								<Rows />
+							</View>
+						</ScrollView>
+					</View>
+					<TouchableOpacity
+						style={styles.addHabitButton}
+						onPress={() => setAdding(true)}
+					>
+						<Ionicons name="add-outline" size={50} color="black" />
+					</TouchableOpacity>
+				</View>
+			)}
 		</SafeAreaView>
 	);
 };
@@ -235,7 +260,8 @@ const styles = StyleSheet.create({
 	title: {
 		fontSize: 40,
 		fontWeight: "bold",
-		marginBottom: "20%",
+		marginVertical: "10%",
+		//marginBottom: "20%",
 	},
 	containerColumn: {
 		flexDirection: "row",
@@ -299,8 +325,8 @@ const styles = StyleSheet.create({
 	},
 	inputContainer: {
 		flexDirection: "row",
-		marginBottom: "5%",
-		width: "95%",
+		marginLeft: "20%",
+		width: "60%",
 	},
 	input: {
 		flex: 1,
@@ -315,6 +341,19 @@ const styles = StyleSheet.create({
 		borderTopRightRadius: 5,
 		borderBottomRightRadius: 5,
 		backgroundColor: "black",
+	},
+	addHabitButton: {
+		position: "absolute",
+		// backgroundColor: "black",
+		// flexDirection: "row",
+		// justifyContent: "center",
+		// alignItems: "center",
+		// marginStart: "50%",
+		// width: "15%",
+		// height: "15%",
+		// borderRadius: ,
+		bottom: "1%",
+		right: "1%",
 	},
 	month: {
 		alignSelf: "stretch",
