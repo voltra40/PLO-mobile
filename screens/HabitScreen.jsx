@@ -183,7 +183,7 @@ const HabitScreen = () => {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			{/* <Text style={styles.title}>Habits</Text> */}
+			<Text style={styles.title}>Habits</Text>
 			{adding ? (
 				<View
 					style={{ flex: 1, alignSelf: "stretch", justifyContent: "center" }}
@@ -201,7 +201,10 @@ const HabitScreen = () => {
 					</View>
 					<TouchableOpacity
 						style={styles.addHabitButton}
-						onPress={() => setAdding(false)}
+						onPress={() => {
+							setAdding(false);
+							Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+						}}
 					>
 						<Ionicons name="close-outline" size={50} color="black" />
 					</TouchableOpacity>
@@ -239,7 +242,10 @@ const HabitScreen = () => {
 					</View>
 					<TouchableOpacity
 						style={styles.addHabitButton}
-						onPress={() => setAdding(true)}
+						onPress={() => {
+							setAdding(true);
+							Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+						}}
 					>
 						<Ionicons name="add-outline" size={50} color="black" />
 					</TouchableOpacity>
@@ -260,7 +266,6 @@ const styles = StyleSheet.create({
 	title: {
 		fontSize: 40,
 		fontWeight: "bold",
-		marginVertical: "10%",
 		//marginBottom: "20%",
 	},
 	containerColumn: {

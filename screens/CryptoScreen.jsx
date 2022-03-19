@@ -141,10 +141,10 @@ const CryptoScreen = () => {
 						onLongPress={() => deleteCrypto(elem)}
 						key={index}
 					>
-						<Text style={styles.cryptoText}> {elem}</Text>
+						<Text style={styles.cryptoText}>{elem}</Text>
 					</Pressable>
 					<View style={styles.cryptoPriceTextContainer}>
-						<Text style={styles.cryptoPriceText}> ${cryptoPrices[index]} </Text>
+						<Text style={styles.cryptoPriceText}>${cryptoPrices[index]}</Text>
 					</View>
 				</View>
 			));
@@ -180,7 +180,9 @@ const CryptoScreen = () => {
 					<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
 				}
 			>
-				<CryptoList />
+				<View style={styles.cryptoListContainer}>
+					<CryptoList />
+				</View>
 			</ScrollView>
 			<View>
 				<TouchableOpacity
@@ -214,7 +216,6 @@ const styles = StyleSheet.create({
 	row: {
 		flexDirection: "row",
 		alignSelf: "stretch",
-		// justifyContent: "center",
 	},
 	inputContainer: {
 		flexDirection: "row",
@@ -244,12 +245,23 @@ const styles = StyleSheet.create({
 	buttonText: {
 		color: "white",
 	},
-	cryptoTextContainer: {
-		marginLeft: "20%",
-		width: "40%",
+	cryptoListContainer: {
+		alignSelf: "center",
 	},
-	cryptoPriceTextContainer: {},
+	cryptoTextContainer: {
+		alignSelf: "stretch",
+		padding: 5,
+		backgroundColor: "black",
+		borderRadius: 5,
+		marginBottom: "5%",
+		justifyContent: "center",
+	},
+	cryptoPriceTextContainer: {
+		alignSelf: "stretch",
+		padding: 10,
+	},
 	cryptoText: {
+		color: "white",
 		textAlign: "left",
 		fontWeight: "bold",
 		fontSize: 20,
