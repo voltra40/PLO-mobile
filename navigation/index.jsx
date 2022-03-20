@@ -10,6 +10,7 @@ import CryptoScreen from "../screens/CryptoScreen";
 import HabitScreen from "../screens/HabitScreen";
 import SleepScreen from "../screens/SleepScreen";
 import Transactions from "../screens/Transactions";
+import Stats from "../screens/Stats";
 
 export default function Navigation() {
 	return <RootNavigator />;
@@ -29,6 +30,11 @@ function RootNavigator() {
 			<Stack.Screen
 				name="Transactions"
 				component={Transactions}
+				options={{ headerShown: false }}
+			/>
+			<Stack.Screen
+				name="Stats"
+				component={Stats}
 				options={{ headerShown: false }}
 			/>
 		</Stack.Navigator>

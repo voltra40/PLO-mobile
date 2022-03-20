@@ -155,6 +155,10 @@ const CryptoScreen = () => {
 		navigation.replace("Transactions");
 	};
 
+	const viewStats = () => {
+		navigation.replace("Stats");
+	};
+
 	const onRefresh = React.useCallback(() => {
 		setRefreshing(true);
 		wait(500).then(() => setRefreshing(false));
@@ -184,12 +188,15 @@ const CryptoScreen = () => {
 					<CryptoList />
 				</View>
 			</ScrollView>
-			<View>
+			<View style={styles.buttonsRow}>
+				<TouchableOpacity onPress={viewStats} style={styles.bottomButton}>
+					<Text style={styles.buttonText}>Stats</Text>
+				</TouchableOpacity>
 				<TouchableOpacity
 					onPress={viewTransactions}
-					style={styles.transactionsButton}
+					style={styles.bottomButton}
 				>
-					<Text style={styles.buttonText}>View Transactions</Text>
+					<Text style={styles.buttonText}>Transactions</Text>
 				</TouchableOpacity>
 			</View>
 		</SafeAreaView>
@@ -222,11 +229,17 @@ const styles = StyleSheet.create({
 		marginBottom: "10%",
 		width: "80%",
 	},
-	transactionsButton: {
+	buttonsRow: {
+		justifyContent: "center",
+		flexDirection: "row",
+		alignSelf: "stretch",
+	},
+	bottomButton: {
 		padding: "5%",
 		borderRadius: 5,
 		backgroundColor: "black",
 		marginBottom: "5%",
+		marginHorizontal: "5%",
 	},
 	input: {
 		flex: 1,
