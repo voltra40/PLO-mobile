@@ -32,7 +32,6 @@ const Transactions = () => {
 			let transactions = [];
 			querySnapshot.forEach((doc) => {
 				transactions.push(doc.data());
-				console.log(doc.data());
 			});
 			// remove first elem
 			transactions.shift();
@@ -40,10 +39,31 @@ const Transactions = () => {
 		});
 	}, []);
 
-	function TransactionList() {
-		const sortedTransactions = transactions.sort().reverse();
+	const list = () => {
+		for (let i = transactions.length - 1; i >= 1; i--) {
+			// check if index i and i-1 < 5
+			if (
+				parseFloat(transactions[i].usd_amount) +
+					parseFloat(transactions[i - 1].usd_amount) <=
+				5.0
+			) {
+				// combine two entries
+				transactions[i - 1].amount = (
+					parseFloat(transactions[i].amount) +
+					parseFloat(transactions[i - 1].amount)
+				).toFixed(6);
+				transactions[i - 1].usd_amount = (
+					parseFloat(transactions[i].usd_amount) +
+					parseFloat(transactions[i - 1].usd_amount)
+				).toFixed(2);
+				transactions.splice(i, 1);
+			}
+		}
+		return transactions.sort().reverse();
+	};
 
-		return sortedTransactions.map((elem, index) => (
+	function TransactionList() {
+		return list().map((elem, index) => (
 			<View style={styles.row} key={index}>
 				<View style={styles.column}>
 					<Text>

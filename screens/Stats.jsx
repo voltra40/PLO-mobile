@@ -78,7 +78,7 @@ const Stats = () => {
 			})
 		);
 		console.log(
-			`total ethereum: ${totalEthereum}, total invested: $${totalInvested}, average price: $${averagePrice}`
+			`total ethereum: ${totalEthereum} ETH, total invested: $${totalInvested}, average price: $${averagePrice}`
 		);
 	};
 
@@ -98,7 +98,7 @@ const Stats = () => {
 						<Text style={styles.statCategoryText}>Total Ethereum</Text>
 					</View>
 					<View style={styles.stat}>
-						<Text style={styles.statText}>{totalEthereum}</Text>
+						<Text style={styles.statText}>{totalEthereum} ETH</Text>
 					</View>
 				</View>
 				<View style={styles.row}>
