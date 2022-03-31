@@ -6,10 +6,12 @@ import {
 	View,
 	TouchableOpacity,
 	ScrollView,
+	RefreshControl,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { auth, firebase } from "../firebase";
 import { Ionicons } from "@expo/vector-icons";
+import axios from "axios";
 
 const Stats = () => {
 	const navigation = useNavigation();
@@ -23,6 +25,7 @@ const Stats = () => {
 	const [totalInvested, setTotalInvested] = useState(0);
 	const [totalEthereum, setTotalEthereum] = useState(0);
 	const [profitOrLoss, setProfitOrLoss] = useState(0);
+	const [refreshing, setRefreshing] = useState(false);
 
 	const user = auth.currentUser;
 	const transactionsRef = firebase
@@ -45,7 +48,7 @@ const Stats = () => {
 
 	useEffect(() => {
 		getStats();
-	}, [transactions]);
+	}, [transactions, refreshing]);
 
 	const getStats = async () => {
 		let tempTotalInvested = 0.0;
@@ -77,39 +80,90 @@ const Stats = () => {
 				maximumFractionDigits: 2,
 			})
 		);
+		// set profit or loss; first get curr price of eth
+		await axios
+			.get(
+				"https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest",
+				{
+					headers: {
+						"X-CMC_PRO_API_KEY": "f963b29f-80ac-4790-903c-b9ba5e511ca4",
+					},
+					params: {
+						symbol: "ETH",
+					},
+				}
+			)
+			.then((response) => {
+				const curr = parseFloat(response.data.data.ETH.quote.USD.price);
+				setProfitOrLoss(
+					(curr * tempTotalEthereum - tempTotalInvested).toLocaleString(
+						"en-US",
+						{
+							minimumFractionDigits: 2,
+							maximumFractionDigits: 2,
+						}
+					)
+				);
+			})
+			.catch((err) => console.log(err));
+
 		console.log(
-			`total ethereum: ${totalEthereum} ETH, total invested: $${totalInvested}, average price: $${averagePrice}`
+			`total ethereum: ${totalEthereum} ETH, total invested: $${totalInvested}, average price: $${averagePrice}, profit or loss: $${profitOrLoss}`
 		);
+	};
+
+	const onRefresh = React.useCallback(() => {
+		setRefreshing(true);
+		wait(500).then(() => setRefreshing(false));
+	}, []);
+
+	const wait = (timeout) => {
+		return new Promise((resolve) => setTimeout(resolve, timeout));
 	};
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<View style={styles.statsContainer}>
-				<View style={styles.row}>
-					<View style={styles.statCategoryContainer}>
-						<Text style={styles.statCategoryText}>Total Invested</Text>
+			<ScrollView
+				style={styles.scrollView}
+				refreshControl={
+					<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+				}
+			>
+				<View style={styles.statsContainer}>
+					<View style={styles.row}>
+						<View style={styles.statCategoryContainer}>
+							<Text style={styles.statCategoryText}>Total Invested</Text>
+						</View>
+						<View style={styles.stat}>
+							<Text style={styles.statText}>${totalInvested}</Text>
+						</View>
 					</View>
-					<View style={styles.stat}>
-						<Text style={styles.statText}>${totalInvested}</Text>
+					<View style={styles.row}>
+						<View style={styles.statCategoryContainer}>
+							<Text style={styles.statCategoryText}>Total Ethereum</Text>
+						</View>
+						<View style={styles.stat}>
+							<Text style={styles.statText}>{totalEthereum} ETH</Text>
+						</View>
+					</View>
+					<View style={styles.row}>
+						<View style={styles.statCategoryContainer}>
+							<Text style={styles.statCategoryText}>Average Price</Text>
+						</View>
+						<View style={styles.stat}>
+							<Text style={styles.statText}>${averagePrice}</Text>
+						</View>
+					</View>
+					<View style={styles.row}>
+						<View style={styles.statCategoryContainer}>
+							<Text style={styles.statCategoryText}>Profit/Loss</Text>
+						</View>
+						<View style={profitOrLoss >= 0 ? styles.profit : styles.loss}>
+							<Text style={styles.statText}>${profitOrLoss}</Text>
+						</View>
 					</View>
 				</View>
-				<View style={styles.row}>
-					<View style={styles.statCategoryContainer}>
-						<Text style={styles.statCategoryText}>Total Ethereum</Text>
-					</View>
-					<View style={styles.stat}>
-						<Text style={styles.statText}>{totalEthereum} ETH</Text>
-					</View>
-				</View>
-				<View style={styles.row}>
-					<View style={styles.statCategoryContainer}>
-						<Text style={styles.statCategoryText}>Average Price</Text>
-					</View>
-					<View style={styles.stat}>
-						<Text style={styles.statText}>${averagePrice}</Text>
-					</View>
-				</View>
-			</View>
+			</ScrollView>
 			<TouchableOpacity onPress={back} style={styles.backButton}>
 				<Ionicons name="chevron-back-outline" size={32} color="white" />
 			</TouchableOpacity>
@@ -157,5 +211,13 @@ const styles = StyleSheet.create({
 	},
 	statText: {
 		fontSize: 20,
+	},
+	profit: {
+		backgroundColor: "green",
+		marginLeft: "auto",
+	},
+	loss: {
+		backgroundColor: "red",
+		marginLeft: "auto",
 	},
 });
