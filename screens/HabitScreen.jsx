@@ -65,7 +65,6 @@ const HabitScreen = () => {
 		.collection("users")
 		.doc(user.uid)
 		.collection("habits")
-		//.doc("my habits");
 		.doc(months[currMonth]);
 
 	// handle loading component

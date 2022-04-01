@@ -15,7 +15,7 @@ const Transactions = () => {
 	const navigation = useNavigation();
 
 	const back = () => {
-		navigation.navigate("Root", { screen: "TabFour" });
+		navigation.navigate("Root", { screen: "Crypto" });
 	};
 
 	const [transactions, setTransactions] = useState([]);
@@ -59,7 +59,7 @@ const Transactions = () => {
 				transactions.splice(i, 1);
 			}
 		}
-		return transactions.sort().reverse();
+		return transactions.sort((a, b) => a.tid - b.tid).reverse();
 	};
 
 	function TransactionList() {

@@ -1,13 +1,12 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import HomeScreen from "../screens/HomeScreen";
-import BucketListScreen from "../screens/BucketListScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 
 // expo's icon library
-import { FontAwesome } from "@expo/vector-icons";
-import CryptoScreen from "../screens/CryptoScreen";
+import { Ionicons } from "@expo/vector-icons";
 import HabitScreen from "../screens/HabitScreen";
+import CryptoScreen from "../screens/CryptoScreen";
+import MacroScreen from "../screens/MacroScreen";
 import SleepScreen from "../screens/SleepScreen";
 import Transactions from "../screens/Transactions";
 import Stats from "../screens/Stats";
@@ -45,53 +44,45 @@ const BottomTab = createBottomTabNavigator();
 
 function BottomTabNavigator() {
 	return (
-		<BottomTab.Navigator initialRouteName="TabOne">
+		<BottomTab.Navigator initialRouteName="Habits">
 			<BottomTab.Screen
-				name="TabOne"
-				component={HomeScreen}
+				name="Habits"
+				component={HabitScreen}
 				options={{
-					title: "Home",
-					headerShown: false,
-					tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
-					tabBarActiveTintColor: "black",
-				}}
-			/>
-			<BottomTab.Screen
-				name="TabTwo"
-				component={BucketListScreen}
-				options={{
-					title: "Bucket",
+					title: "Habits",
 					headerShown: false,
 					tabBarIcon: ({ color }) => (
-						<TabBarIcon name="list-ul" color={color} />
+						<TabBarIcon name="grid-outline" color={color} />
 					),
 					tabBarActiveTintColor: "black",
 				}}
 			/>
 			<BottomTab.Screen
-				name="TabThree"
-				component={HabitScreen}
-				options={{
-					title: "Habits",
-					headerShown: false,
-					tabBarIcon: ({ color }) => <TabBarIcon name="table" color={color} />,
-					tabBarActiveTintColor: "black",
-				}}
-			/>
-			<BottomTab.Screen
-				name="TabFour"
+				name="Crypto"
 				component={CryptoScreen}
 				options={{
 					title: "Crypto",
 					headerShown: false,
 					tabBarIcon: ({ color }) => (
-						<TabBarIcon name="bitcoin" color={color} />
+						<TabBarIcon name="logo-bitcoin" color={color} />
 					),
 					tabBarActiveTintColor: "black",
 				}}
 			/>
 			<BottomTab.Screen
-				name="TabFive"
+				name="Macro"
+				component={MacroScreen}
+				options={{
+					title: "Macro",
+					headerShown: false,
+					tabBarIcon: ({ color }) => (
+						<TabBarIcon name="nutrition" color={color} />
+					),
+					tabBarActiveTintColor: "black",
+				}}
+			/>
+			<BottomTab.Screen
+				name="Sleep"
 				component={SleepScreen}
 				options={{
 					title: "Sleep",
@@ -101,12 +92,12 @@ function BottomTabNavigator() {
 				}}
 			/>
 			<BottomTab.Screen
-				name="TabSix"
+				name="Profile"
 				component={ProfileScreen}
 				options={{
 					title: "Profile",
 					headerShown: false,
-					tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+					tabBarIcon: ({ color }) => <TabBarIcon name="person" color={color} />,
 					tabBarActiveTintColor: "black",
 				}}
 			/>
@@ -116,5 +107,5 @@ function BottomTabNavigator() {
 
 // for use with tab bar icons, necessary
 function TabBarIcon(props) {
-	return <FontAwesome size={30} style={{ marginBottom: -3 }} {...props} />;
+	return <Ionicons size={30} style={{ marginBottom: -3 }} {...props} />;
 }

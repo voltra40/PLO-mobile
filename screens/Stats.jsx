@@ -17,7 +17,7 @@ const Stats = () => {
 	const navigation = useNavigation();
 
 	const back = () => {
-		navigation.navigate("Root", { screen: "TabFour" });
+		navigation.navigate("Root", { screen: "Crypto" });
 	};
 
 	const [transactions, setTransactions] = useState([]);
