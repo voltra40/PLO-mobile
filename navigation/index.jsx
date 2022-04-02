@@ -10,6 +10,7 @@ import MacroScreen from "../screens/MacroScreen";
 import SleepScreen from "../screens/SleepScreen";
 import Transactions from "../screens/Transactions";
 import Stats from "../screens/Stats";
+import Meals from "../screens/MealScreen";
 
 export default function Navigation() {
 	return <RootNavigator />;
@@ -34,6 +35,11 @@ function RootNavigator() {
 			<Stack.Screen
 				name="Stats"
 				component={Stats}
+				options={{ headerShown: false }}
+			/>
+			<Stack.Screen
+				name="Meals"
+				component={Meals}
 				options={{ headerShown: false }}
 			/>
 		</Stack.Navigator>
@@ -70,10 +76,10 @@ function BottomTabNavigator() {
 				}}
 			/>
 			<BottomTab.Screen
-				name="Macro"
+				name="Macros"
 				component={MacroScreen}
 				options={{
-					title: "Macro",
+					title: "Macros",
 					headerShown: false,
 					tabBarIcon: ({ color }) => (
 						<TabBarIcon name="nutrition" color={color} />
