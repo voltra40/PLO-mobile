@@ -7,6 +7,7 @@ import {
 	View,
 	TouchableOpacity,
 	ScrollView,
+	Keyboard,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { auth, firebase } from "../firebase";
@@ -26,7 +27,9 @@ const Meals = ({ route }) => {
 
 	const navigation = useNavigation();
 
-	const day = route.params;
+	const macros = route.params.macros;
+
+	const day = Object.keys(macros)[0];
 
 	const user = auth.currentUser;
 	const macroRef = firebase
@@ -34,14 +37,14 @@ const Meals = ({ route }) => {
 		.collection("users")
 		.doc(user.uid)
 		.collection("macros")
-		.doc(day.day);
+		.doc(day);
 
 	const back = () => {
 		navigation.navigate("Root", { screen: "Macros" });
 	};
 
 	useEffect(() => {
-		console.log("day:", day.day);
+		console.log("day:", day);
 		getMeals();
 	}, []);
 
@@ -51,12 +54,11 @@ const Meals = ({ route }) => {
 			.collection("users")
 			.doc(user.uid)
 			.collection("macros")
-			.doc(day.day)
+			.doc(day)
 			.onSnapshot((doc) => {
 				setMealNames(Object.keys(doc.data()));
 				setMealData(doc.data());
 				setLoading(false);
-				console.log("doc data:", mealData);
 			});
 	};
 
@@ -79,6 +81,7 @@ const Meals = ({ route }) => {
 					setProtein("");
 					setCarbs("");
 					setFat("");
+					Keyboard.dismiss();
 					setLoading(false);
 				})
 				.catch((err) => console.log(err));
@@ -107,7 +110,7 @@ const Meals = ({ route }) => {
 				</View>
 			) : (
 				<View style={styles.inputContainer}>
-					<Text style={styles.title}> {day.day}</Text>
+					<Text style={styles.title}>{day}</Text>
 					<TextInput
 						placeholder="meal"
 						value={meal}

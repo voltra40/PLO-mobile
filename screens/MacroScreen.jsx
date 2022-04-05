@@ -4,21 +4,15 @@ import {
 	Text,
 	View,
 	TouchableOpacity,
-	TextInput,
 	SafeAreaView,
 	ScrollView,
-	Keyboard,
 } from "react-native";
 import { auth, firebase } from "../firebase";
 import { useNavigation } from "@react-navigation/native";
 
 const MacroScreen = () => {
 	const [loading, setLoading] = useState(true);
-	const [macroDays, setMacroDays] = useState([]);
-	const [macroList, setMacroList] = useState([]);
-	const [macro, setMacro] = useState();
-	const [meal, setMeal] = useState("");
-	const [mealData, setMealData] = useState({});
+	const [macros, setMacros] = useState([]);
 
 	const navigation = useNavigation();
 	const today = new Date(Date.now()).toDateString();
@@ -35,69 +29,74 @@ const MacroScreen = () => {
 		macroRef.doc(today).onSnapshot((response) => {
 			if (response.exists) {
 				console.log("macro ref exist for today:", today);
-				const macros = response.data();
-				console.log(macros);
 			} else {
 				console.log("creating new macro list for today:", today);
-				macroRef.set({});
+				macroRef.doc(today).set({});
 			}
 		});
 		getAllMacros();
 	}, []);
 
 	const getAllMacros = () => {
-		let tempDays = [];
-		let tempList = [];
+		let macroObj = [];
 		macroRef.get().then((querySnapshot) => {
 			querySnapshot.forEach((doc) => {
-				console.log(doc.id, " => ", doc.data());
-				tempDays.push(doc.id);
-				tempList.push(doc.data());
+				macroObj.push({ [doc.id]: doc.data() });
 			});
-			setMacroDays(tempDays);
-			setMacroList(tempList);
-			// console.log("macro day:", macroList);
+
+			// sorts list of macros by date in descending order
+			setMacros(
+				macroObj
+					.sort((a, b) => new Date(Object.keys(a)) - new Date(Object.keys(b)))
+					.reverse()
+			);
 			setLoading(false);
 		});
 	};
 
-	const getTotal = (meals) => {
-		console.log("real item", meals);
+	const getTotal = (macroDay) => {
 		const total = {
 			calories: 0,
 			carbs: 0,
 			protein: 0,
 			fat: 0,
 		};
-		for (let meal in meals) {
-			total.calories += Number(meals[meal].calories);
-			total.carbs += Number(meals[meal].carbs);
-			total.protein += Number(meals[meal].protein);
-			total.fat += Number(meals[meal].fat);
+
+		// destructure object
+		for (let meals of macroDay) {
+			Object.values(meals).forEach((meal) => {
+				total.calories += Number(meal.calories);
+				total.carbs += Number(meal.carbs);
+				total.protein += Number(meal.protein);
+				total.fat += Number(meal.fat);
+			});
 		}
-		console.log("total:", total);
+		// console.log("total:", total);
 		return total;
 	};
 
+	// opens page for specific day
+	const viewMore = (macros) => {
+		console.log(macros);
+		navigation.replace("Meals", { macros });
+	};
+
+	// component lists day and total macro nutrients
 	function MacroRow() {
-		return macroList.map((item, index) => (
+		return macros.map((item, index) => (
 			<View style={styles.macroListContainer} key={index}>
-				<TouchableOpacity onPress={() => viewMore(macroDays[index])}>
-					<Text style={styles.dateText}>{macroDays[index]}</Text>
+				<TouchableOpacity onPress={() => viewMore(item)}>
+					<Text style={styles.dateText}>{Object.keys(item)}</Text>
 				</TouchableOpacity>
 				<View style={styles.row}>
-					<Text>calories: {getTotal(item).calories}, </Text>
-					<Text>protein: {getTotal(item).protein}g, </Text>
-					<Text>carbs: {getTotal(item).carbs}g, </Text>
-					<Text>fat: {getTotal(item).fat}g </Text>
+					<Text>calories: {getTotal(Object.values(item)).calories}, </Text>
+					<Text>protein: {getTotal(Object.values(item)).protein}g, </Text>
+					<Text>carbs: {getTotal(Object.values(item)).carbs}g, </Text>
+					<Text>fat: {getTotal(Object.values(item)).fat}g </Text>
 				</View>
 			</View>
 		));
 	}
-
-	const viewMore = (day) => {
-		navigation.replace("Meals", { day });
-	};
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -105,9 +104,7 @@ const MacroScreen = () => {
 			{loading ? (
 				<Text> loading </Text>
 			) : (
-				<ScrollView style={styles.scrollView}>
-					<MacroRow />
-				</ScrollView>
+				<ScrollView style={styles.scrollView}>{<MacroRow />}</ScrollView>
 			)}
 		</SafeAreaView>
 	);
