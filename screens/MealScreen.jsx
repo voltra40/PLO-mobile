@@ -6,21 +6,24 @@ import {
 	TextInput,
 	View,
 	TouchableOpacity,
+	Pressable,
 	ScrollView,
 	Keyboard,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { auth, firebase } from "../firebase";
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 
 const Meals = ({ route }) => {
 	const [loading, setLoading] = useState(true);
+	const [reload, setReload] = useState(false);
 
 	const [meal, setMeal] = useState("");
-	const [calories, setCalories] = useState("");
-	const [protein, setProtein] = useState("");
-	const [carbs, setCarbs] = useState("");
-	const [fat, setFat] = useState("");
+
+	const [macroInputRows, setMacroInputRows] = useState([
+		{ calories: 0.0, fat: 0.0, carbs: 0.0, protein: 0.0 },
+	]);
 
 	const [mealNames, setMealNames] = useState([]);
 	const [mealData, setMealData] = useState([]);
@@ -44,43 +47,47 @@ const Meals = ({ route }) => {
 	};
 
 	useEffect(() => {
-		console.log("day:", day);
-		getMeals();
-	}, []);
-
-	const getMeals = () => {
-		firebase
-			.firestore()
-			.collection("users")
-			.doc(user.uid)
-			.collection("macros")
-			.doc(day)
-			.onSnapshot((doc) => {
-				setMealNames(Object.keys(doc.data()));
-				setMealData(doc.data());
-				setLoading(false);
-			});
-	};
+		return macroRef.onSnapshot((doc) => {
+			setMealNames(Object.keys(doc.data()));
+			setMealData(doc.data());
+			setLoading(false);
+		});
+	}, [reload]);
 
 	const addMeal = () => {
 		if (meal !== "") {
 			setLoading(true);
+
+			// totals
+			let calories = 0.0;
+			let fat = 0.0;
+			let carbs = 0.0;
+			let protein = 0.0;
+
+			// get total from every ingredient in meal
+			for (let ingredient of macroInputRows) {
+				calories += Math.round(ingredient.calories);
+				fat += Math.round(ingredient.fat);
+				carbs += Math.round(ingredient.carbs);
+				protein += Math.round(ingredient.protein);
+			}
+
 			macroRef
 				.update({
 					[meal]: {
 						calories: calories,
-						protein: protein,
-						carbs: carbs,
 						fat: fat,
+						carbs: carbs,
+						protein: protein,
 					},
 				})
 				.then(() => {
-					console.log("added new meal");
+					console.log(`added new meal: ${meal}`);
 					setMeal("");
-					setCalories("");
-					setProtein("");
-					setCarbs("");
-					setFat("");
+					// clean up
+					setMacroInputRows([
+						{ calories: 0.0, fat: 0.0, carbs: 0.0, protein: 0.0 },
+					]);
 					Keyboard.dismiss();
 					setLoading(false);
 				})
@@ -88,18 +95,96 @@ const Meals = ({ route }) => {
 		}
 	};
 
-	function Meals() {
-		return mealNames.sort().map((elem, index) => (
-			<View style={styles.mealContainer} key={index}>
-				<Text style={styles.mealText}>{elem}</Text>
-				<View style={styles.row}>
-					<Text>calories: {mealData[elem].calories}, </Text>
-					<Text>protein: {mealData[elem].protein}g, </Text>
-					<Text>carbs: {mealData[elem].carbs}g, </Text>
-					<Text>fat: {mealData[elem].fat}g</Text>
-				</View>
+	const addInput = () => {
+		setMacroInputRows([
+			...macroInputRows,
+			{ calories: 0.0, fat: 0.0, carbs: 0.0, protein: 0.0 },
+		]);
+		setReload(!reload);
+		console.log("macroInputRows:", macroInputRows);
+	};
+
+	const deleteInput = (index) => {
+		console.log("delete");
+		let copy = macroInputRows;
+		copy.splice(index, 1);
+		setMacroInputRows(copy);
+		setReload(!reload);
+		console.log("rows:", macroInputRows);
+	};
+
+	function MacroInputs() {
+		return macroInputRows.map((elem, index) => (
+			<View style={styles.row} key={index}>
+				<TextInput
+					placeholder="calories"
+					value={elem.calories}
+					onChangeText={(text) => (elem.calories = text)}
+					style={styles.input}
+				/>
+				<TextInput
+					placeholder="fat"
+					value={elem.fat}
+					onChangeText={(text) => (elem.fat = text)}
+					style={styles.input}
+				/>
+				<TextInput
+					placeholder="carbs"
+					value={elem.carbs}
+					onChangeText={(text) => (elem.carbs = text)}
+					style={styles.input}
+				/>
+				<TextInput
+					placeholder="protein"
+					value={elem.protein}
+					onChangeText={(text) => (elem.protein = text)}
+					style={styles.input}
+				/>
+				{index == macroInputRows.length - 1 ? (
+					<TouchableOpacity onPress={addInput}>
+						<Ionicons name="add-circle" size={32} color="black" />
+					</TouchableOpacity>
+				) : (
+					<TouchableOpacity onPress={() => deleteInput(index)}>
+						<Ionicons name="close-circle-outline" size={32} color="black" />
+					</TouchableOpacity>
+				)}
 			</View>
 		));
+	}
+
+	const deleteMeal = (elem) => {
+		setLoading(true);
+		console.log("elem:", elem);
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+		macroRef
+			.update({ [elem]: firebase.firestore.FieldValue.delete() })
+			.then(() => console.log(elem, "deleted"), setLoading(false))
+			.catch((error) => alert(error.message));
+	};
+
+	function Meals() {
+		if (!loading) {
+			return mealNames.sort().map((elem, index) => (
+				<View style={styles.mealContainer} key={index}>
+					<Pressable onLongPress={() => deleteMeal(elem)}>
+						<Text style={styles.mealText}>{elem}</Text>
+					</Pressable>
+					<View style={styles.row}>
+						<Text style={styles.detailsText}>
+							calories: {mealData[elem].calories},{" "}
+						</Text>
+						<Text style={styles.detailsText}>fat: {mealData[elem].fat}g, </Text>
+						<Text style={styles.detailsText}>
+							carbs: {mealData[elem].carbs}g,{" "}
+						</Text>
+						<Text style={styles.detailsText}>
+							protein: {mealData[elem].protein}g
+						</Text>
+					</View>
+				</View>
+			));
+		}
 	}
 
 	return (
@@ -117,33 +202,8 @@ const Meals = ({ route }) => {
 						onChangeText={(text) => setMeal(text)}
 						style={styles.mealInput}
 					/>
-					<View style={styles.row}>
-						<TextInput
-							placeholder="calories"
-							value={calories}
-							onChangeText={(text) => setCalories(text)}
-							style={styles.input}
-						/>
-						<TextInput
-							placeholder="protein"
-							value={protein}
-							onChangeText={(text) => setProtein(text)}
-							style={styles.input}
-						/>
-						<TextInput
-							placeholder="carbs"
-							value={carbs}
-							onChangeText={(text) => setCarbs(text)}
-							style={styles.input}
-						/>
-						<TextInput
-							placeholder="fat"
-							value={fat}
-							onChangeText={(text) => setFat(text)}
-							style={styles.input}
-						/>
-					</View>
-					<TouchableOpacity onPress={addMeal} style={styles.inputButton}>
+					<MacroInputs />
+					<TouchableOpacity onPress={addMeal} style={styles.addButton}>
 						<Text style={styles.buttonText}>Add</Text>
 					</TouchableOpacity>
 					<ScrollView style={styles.scrollView}>
@@ -191,26 +251,28 @@ const styles = StyleSheet.create({
 		left: 0,
 	},
 	scrollView: {
+		marginTop: "5%",
 		alignSelf: "stretch",
 	},
 	mealContainer: {
 		marginBottom: "5%",
 	},
 	mealInput: {
-		padding: "5%",
+		padding: "2%",
 		borderWidth: 2,
 		marginBottom: "5%",
 		borderRadius: 5,
+		fontSize: 20,
 	},
 	input: {
 		padding: "2%",
 		width: "21%",
 		borderWidth: 1,
 		marginBottom: "5%",
-		marginRight: "1%",
+		marginRight: "2%",
 		borderRadius: 5,
 	},
-	inputButton: {
+	addButton: {
 		padding: "5%",
 		borderRadius: 5,
 		backgroundColor: "black",
@@ -220,6 +282,9 @@ const styles = StyleSheet.create({
 		color: "white",
 	},
 	mealText: {
-		fontSize: 20,
+		fontSize: 22.5,
+	},
+	detailsText: {
+		fontSize: 15,
 	},
 });

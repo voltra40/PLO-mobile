@@ -29,12 +29,13 @@ const MacroScreen = () => {
 		macroRef.doc(today).onSnapshot((response) => {
 			if (response.exists) {
 				console.log("macro ref exist for today:", today);
+				getAllMacros();
 			} else {
 				console.log("creating new macro list for today:", today);
 				macroRef.doc(today).set({});
+				getAllMacros();
 			}
 		});
-		getAllMacros();
 	}, []);
 
 	const getAllMacros = () => {
