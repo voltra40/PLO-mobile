@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { auth, firebase } from "../firebase";
 import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 
 const MacroScreen = () => {
 	const [loading, setLoading] = useState(true);
@@ -85,17 +86,31 @@ const MacroScreen = () => {
 	// component lists day and total macro nutrients
 	function MacroRow() {
 		return macros.map((item, index) => (
-			<View style={styles.macroListContainer} key={index}>
-				<TouchableOpacity onPress={() => viewMore(item)}>
-					<Text style={styles.dateText}>{Object.keys(item)}</Text>
-				</TouchableOpacity>
+			<TouchableOpacity
+				onPress={() => viewMore(item)}
+				style={styles.macroListContainer}
+				key={index}
+			>
 				<View style={styles.row}>
-					<Text>calories: {getTotal(Object.values(item)).calories}, </Text>
-					<Text>protein: {getTotal(Object.values(item)).protein}g, </Text>
-					<Text>carbs: {getTotal(Object.values(item)).carbs}g, </Text>
-					<Text>fat: {getTotal(Object.values(item)).fat}g </Text>
+					<View style={styles.dateContainer}>
+						<Text style={styles.dateText}>{Object.keys(item)}</Text>
+					</View>
 				</View>
-			</View>
+				<View style={styles.macroContainer}>
+					<Text style={styles.detailsText}>
+						calories: {getTotal(Object.values(item)).calories}
+					</Text>
+					<Text style={styles.detailsText}>
+						fat: {getTotal(Object.values(item)).fat}g
+					</Text>
+					<Text style={styles.detailsText}>
+						carbs: {getTotal(Object.values(item)).carbs}g
+					</Text>
+					<Text style={styles.detailsText}>
+						protein: {getTotal(Object.values(item)).protein}g
+					</Text>
+				</View>
+			</TouchableOpacity>
 		));
 	}
 
@@ -126,18 +141,31 @@ const styles = StyleSheet.create({
 	title: {
 		fontSize: 40,
 		fontWeight: "bold",
-		marginBottom: "20%",
+		marginBottom: "10%",
 	},
 	row: {
 		flexDirection: "row",
 		alignSelf: "stretch",
-		marginBottom: "5%",
 	},
 	macroListContainer: {
 		alignSelf: "stretch",
 		marginHorizontal: "5%",
+		borderWidth: 2,
+		borderRadius: 5,
+		marginBottom: "5%",
+	},
+	macroContainer: {
+		marginVertical: "3%",
+		marginLeft: "2%",
+	},
+	dateContainer: {
+		borderBottomWidth: 5,
+		marginLeft: "2%",
 	},
 	dateText: {
-		fontSize: 20,
+		fontSize: 25,
+	},
+	detailsText: {
+		fontSize: 15,
 	},
 });
