@@ -11,6 +11,7 @@ import SleepScreen from "../screens/SleepScreen";
 import Transactions from "../screens/Transactions";
 import Stats from "../screens/Stats";
 import Meals from "../screens/MealScreen";
+import HabitLandingPage from "../screens/HabitLandingPage";
 
 export default function Navigation() {
 	return <RootNavigator />;
@@ -42,6 +43,11 @@ function RootNavigator() {
 				component={Meals}
 				options={{ headerShown: false }}
 			/>
+			<Stack.Screen
+				name="Habits"
+				component={HabitScreen}
+				options={{ headerShown: false }}
+			/>
 		</Stack.Navigator>
 	);
 }
@@ -53,7 +59,7 @@ function BottomTabNavigator() {
 		<BottomTab.Navigator initialRouteName="Habits">
 			<BottomTab.Screen
 				name="Habits"
-				component={HabitScreen}
+				component={HabitLandingPage}
 				options={{
 					title: "Habits",
 					headerShown: false,

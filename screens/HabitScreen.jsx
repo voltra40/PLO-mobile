@@ -13,8 +13,15 @@ import {
 import { auth, firebase } from "../firebase";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { useNavigation } from "@react-navigation/native";
 
 const HabitScreen = () => {
+	const navigation = useNavigation();
+
+	const back = () => {
+		navigation.replace("Root");
+	};
+
 	// double array does not store habit type like "meditation"
 	const [habits, setHabits] = useState({});
 	// seperate array of habit types
@@ -188,7 +195,6 @@ const HabitScreen = () => {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<Text style={styles.title}>Habits</Text>
 			{adding ? (
 				<View
 					style={{ flex: 1, alignSelf: "stretch", justifyContent: "center" }}
@@ -205,7 +211,7 @@ const HabitScreen = () => {
 						</TouchableOpacity>
 					</View>
 					<TouchableOpacity
-						style={styles.backButton}
+						style={styles.cancel}
 						onPress={() => {
 							setAdding(false);
 							Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -215,7 +221,7 @@ const HabitScreen = () => {
 					</TouchableOpacity>
 				</View>
 			) : (
-				<View style={{ flex: 1, alignSelf: "stretch", marginTop: "10%" }}>
+				<View style={styles.calendarContainer}>
 					<View style={styles.leftAndRightRow}>
 						<TouchableOpacity style={styles.back} onPress={decrementMonth}>
 							<Ionicons name="arrow-back-outline" size={20} color="white" />
@@ -262,6 +268,9 @@ const HabitScreen = () => {
 					</View>
 				</View>
 			)}
+			<TouchableOpacity onPress={back} style={styles.backButton}>
+				<Ionicons name="chevron-back-outline" size={32} color="white" />
+			</TouchableOpacity>
 		</SafeAreaView>
 	);
 };
@@ -274,9 +283,10 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		backgroundColor: "white",
 	},
-	title: {
-		fontSize: 40,
-		fontWeight: "bold",
+	calendarContainer: {
+		flex: 1,
+		alignSelf: "stretch",
+		justifyContent: "center",
 	},
 	containerColumn: {
 		flexDirection: "row",
@@ -373,6 +383,15 @@ const styles = StyleSheet.create({
 		borderRadius: 5,
 	},
 	backButton: {
+		position: "absolute",
+		bottom: "5%",
+		backgroundColor: "black",
+		padding: 2,
+		borderTopRightRadius: 5,
+		borderBottomRightRadius: 5,
+		left: 0,
+	},
+	cancel: {
 		position: "absolute",
 		bottom: "1%",
 		right: "1%",
