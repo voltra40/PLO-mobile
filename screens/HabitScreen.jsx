@@ -195,6 +195,14 @@ const HabitScreen = () => {
 
 	return (
 		<SafeAreaView style={styles.container}>
+			<View style={styles.header}>
+				<View style={styles.heading}>
+					<Text style={styles.headerText}>Calendar</Text>
+				</View>
+				<TouchableOpacity onPress={back} style={styles.close}>
+					<Ionicons name="close-sharp" size={32} color="white" />
+				</TouchableOpacity>
+			</View>
 			{adding ? (
 				<View
 					style={{ flex: 1, alignSelf: "stretch", justifyContent: "center" }}
@@ -268,9 +276,6 @@ const HabitScreen = () => {
 					</View>
 				</View>
 			)}
-			<TouchableOpacity onPress={back} style={styles.backButton}>
-				<Ionicons name="chevron-back-outline" size={32} color="white" />
-			</TouchableOpacity>
 		</SafeAreaView>
 	);
 };
@@ -282,6 +287,27 @@ const styles = StyleSheet.create({
 		flex: 1,
 		alignItems: "center",
 		backgroundColor: "white",
+	},
+	header: {
+		alignSelf: "stretch",
+		justifyContent: "center",
+		flexDirection: "row",
+		borderBottomWidth: 1,
+		paddingVertical: "1%",
+		backgroundColor: "black",
+	},
+	heading: {
+		alignSelf: "center",
+	},
+	headerText: {
+		fontSize: 20,
+		fontWeight: "bold",
+		color: "white",
+	},
+	close: {
+		position: "absolute",
+		right: 0,
+		top: "-1%",
 	},
 	calendarContainer: {
 		flex: 1,
@@ -381,15 +407,6 @@ const styles = StyleSheet.create({
 		padding: 5,
 		backgroundColor: "black",
 		borderRadius: 5,
-	},
-	backButton: {
-		position: "absolute",
-		bottom: "5%",
-		backgroundColor: "black",
-		padding: 2,
-		borderTopRightRadius: 5,
-		borderBottomRightRadius: 5,
-		left: 0,
 	},
 	cancel: {
 		position: "absolute",

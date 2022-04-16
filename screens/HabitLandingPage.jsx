@@ -58,19 +58,14 @@ const HabitLandingPage = () => {
 			if (response.exists) {
 				const habits = response.data();
 				let _habits = [];
-				let _data = [];
 				// check completion
 				for (let habit in habits) {
-					// console.log(habit);
-					// console.log("data:", habits[habit]);
 					if (!habits[habit][new Date().getDate() - 1]) {
 						_habits.push(habit);
 					}
-					// _data.push({ habit: habit, data: habits[habit] });
 				}
 				setHabits(_habits);
 				setHabitData(response.data());
-				//console.log(habitData);
 				setLoading(false);
 			} else {
 				console.log("habit ref does not exist");
@@ -78,7 +73,13 @@ const HabitLandingPage = () => {
 		});
 	};
 
-	const getCompletion = (habit) => {};
+	const getCompletion = (habit) => {
+		let count = 0;
+		for (let days of habitData[habit]) {
+			if (days) count++;
+		}
+		return count.toString() + "/" + today.getDate().toString();
+	};
 
 	function Habits() {
 		return habits.sort().map((habit, index) => (
@@ -87,7 +88,7 @@ const HabitLandingPage = () => {
 					<Text style={styles.habitText}>{habit}</Text>
 				</View>
 				<View style={styles.completion}>
-					<Text style={styles.habitText}>{getCompletion(habit)}</Text>
+					<Text style={styles.habitCompletionText}>{getCompletion(habit)}</Text>
 				</View>
 				<TouchableOpacity
 					onPress={() => complete(habit)}
@@ -149,7 +150,6 @@ const styles = StyleSheet.create({
 	},
 	subHeading: {
 		fontSize: 30,
-		// marginBottom: "5%",
 	},
 	habitContainer: {
 		flex: 0.8,
@@ -158,6 +158,7 @@ const styles = StyleSheet.create({
 	},
 	habitTextContainer: {
 		marginBottom: "2%",
+		width: "80%",
 	},
 	individualHabitContainer: {
 		alignSelf: "stretch",
@@ -167,7 +168,7 @@ const styles = StyleSheet.create({
 	},
 	completion: {
 		position: "absolute",
-		right: 32,
+		right: 32 + 8,
 	},
 	completionIcon: {
 		position: "absolute",
@@ -184,6 +185,10 @@ const styles = StyleSheet.create({
 	},
 	habitText: {
 		fontSize: 25,
+	},
+	habitCompletionText: {
+		fontSize: 20,
+		fontWeight: "300",
 	},
 	buttonText: {
 		color: "white",

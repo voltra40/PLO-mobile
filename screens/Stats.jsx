@@ -123,6 +123,14 @@ const Stats = () => {
 
 	return (
 		<SafeAreaView style={styles.container}>
+			<View style={styles.header}>
+				<View style={styles.heading}>
+					<Text style={styles.headerText}>Stats</Text>
+				</View>
+				<TouchableOpacity onPress={back} style={styles.close}>
+					<Ionicons name="close-sharp" size={32} color="white" />
+				</TouchableOpacity>
+			</View>
 			<ScrollView
 				style={styles.scrollView}
 				refreshControl={
@@ -164,9 +172,6 @@ const Stats = () => {
 					</View>
 				</View>
 			</ScrollView>
-			<TouchableOpacity onPress={back} style={styles.backButton}>
-				<Ionicons name="chevron-back-outline" size={32} color="white" />
-			</TouchableOpacity>
 		</SafeAreaView>
 	);
 };
@@ -179,14 +184,26 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 	},
-	backButton: {
-		position: "absolute",
-		bottom: "5%",
+	header: {
+		alignSelf: "stretch",
+		justifyContent: "center",
+		flexDirection: "row",
+		borderBottomWidth: 1,
+		paddingVertical: "1%",
 		backgroundColor: "black",
-		padding: 2,
-		borderTopRightRadius: 5,
-		borderBottomRightRadius: 5,
-		left: 0,
+	},
+	heading: {
+		alignSelf: "center",
+	},
+	headerText: {
+		fontSize: 20,
+		fontWeight: "bold",
+		color: "white",
+	},
+	close: {
+		position: "absolute",
+		right: 0,
+		top: "-1%",
 	},
 	scrollView: {
 		flex: 1,

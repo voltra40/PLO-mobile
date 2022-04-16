@@ -93,16 +93,16 @@ const Transactions = () => {
 			<View style={{ marginLeft: "10%" }}>
 				<View style={styles.row}>
 					<View style={styles.column}>
-						<Text style={styles.headerText}>Date</Text>
+						<Text style={styles.columnHeaderText}>Date</Text>
 					</View>
 					<View style={styles.column}>
-						<Text style={styles.headerText}> Price</Text>
+						<Text style={styles.columnHeaderText}> Price</Text>
 					</View>
 					<View style={styles.column}>
-						<Text style={styles.headerText}> Amount</Text>
+						<Text style={styles.columnHeaderText}> Amount</Text>
 					</View>
 					<View style={styles.column}>
-						<Text style={styles.headerText}> USD</Text>
+						<Text style={styles.columnHeaderText}> USD</Text>
 					</View>
 				</View>
 			</View>
@@ -111,15 +111,20 @@ const Transactions = () => {
 
 	return (
 		<SafeAreaView style={styles.container}>
+			<View style={styles.header}>
+				<View style={styles.heading}>
+					<Text style={styles.headerText}>Transactions</Text>
+				</View>
+				<TouchableOpacity onPress={back} style={styles.close}>
+					<Ionicons name="close-sharp" size={32} color="white" />
+				</TouchableOpacity>
+			</View>
 			<HeaderRow />
 			<ScrollView style={styles.scrollView}>
 				<View style={styles.tListContainer}>
 					<TransactionList />
 				</View>
 			</ScrollView>
-			<TouchableOpacity onPress={back} style={styles.backButton}>
-				<Ionicons name="chevron-back-outline" size={32} color="white" />
-			</TouchableOpacity>
 		</SafeAreaView>
 	);
 };
@@ -132,14 +137,26 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 	},
-	backButton: {
-		position: "absolute",
-		bottom: "5%",
+	header: {
+		alignSelf: "stretch",
+		justifyContent: "center",
+		flexDirection: "row",
+		borderBottomWidth: 1,
+		paddingVertical: "1%",
 		backgroundColor: "black",
-		padding: 2,
-		borderTopRightRadius: 5,
-		borderBottomRightRadius: 5,
-		left: 0,
+	},
+	heading: {
+		alignSelf: "center",
+	},
+	headerText: {
+		fontSize: 20,
+		fontWeight: "bold",
+		color: "white",
+	},
+	close: {
+		position: "absolute",
+		right: 0,
+		top: "-1%",
 	},
 	scrollView: {
 		flex: 1,
@@ -147,7 +164,6 @@ const styles = StyleSheet.create({
 	},
 	tListContainer: {
 		marginLeft: "10%",
-		// alignSelf: "center",
 	},
 	row: {
 		flexDirection: "row",
@@ -157,7 +173,7 @@ const styles = StyleSheet.create({
 		alignSelf: "stretch",
 		width: "25%",
 	},
-	headerText: {
+	columnHeaderText: {
 		fontSize: 20,
 		fontWeight: "bold",
 	},
