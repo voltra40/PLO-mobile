@@ -24,6 +24,7 @@ const CryptoScreen = () => {
 	const [cryptoList, setCryptoList] = useState([]);
 	const [crypto, setCrypto] = useState("");
 	const [cryptoPrices, setCryptoPrices] = useState([]);
+	const [percentChange, setPercentChange] = useState([]);
 	const [refreshing, setRefreshing] = useState(false);
 
 	const navigation = useNavigation();
@@ -111,15 +112,27 @@ const CryptoScreen = () => {
 				// console.log(json);
 				resolve(json);
 				let tempPrices = [];
+				let tempPercentChange = [];
 				for (let symbol in json) {
 					tempPrices.push(
 						json[symbol].quote.USD.price >= 1
 							? json[symbol].quote.USD.price.toFixed(2).toLocaleString("en-US")
 							: json[symbol].quote.USD.price.toFixed(4).toLocaleString("en-US")
 					);
+					tempPercentChange.push(
+						json[symbol].quote.USD.percent_change_24h
+							.toFixed(2)
+							.toLocaleString("en-US")
+					);
 				}
 				setCryptoPrices(tempPrices);
-				console.log("crypto prices:", tempPrices);
+				setPercentChange(tempPercentChange);
+				console.log(
+					"crypto prices:",
+					tempPrices,
+					"percent change:",
+					tempPercentChange
+				);
 			}
 		});
 	}
@@ -135,16 +148,31 @@ const CryptoScreen = () => {
 			const sortedCrypto = cryptoList.sort();
 
 			return sortedCrypto.map((elem, index) => (
-				<View style={styles.row} key={index}>
-					<Pressable
-						style={styles.cryptoTextContainer}
-						onLongPress={() => deleteCrypto(elem)}
-						key={index}
-					>
-						<Text style={styles.cryptoText}>{elem}</Text>
-					</Pressable>
-					<View style={styles.cryptoPriceTextContainer}>
-						<Text style={styles.cryptoPriceText}>${cryptoPrices[index]}</Text>
+				<View style={styles.rowContainer} key={index}>
+					<View style={styles.row}>
+						<View style={styles.cryptoTextContainer}>
+							<Pressable
+								style={styles.cryptoTextSubContainer}
+								onLongPress={() => deleteCrypto(elem)}
+								key={index}
+							>
+								<Text style={styles.cryptoText}>{elem}</Text>
+							</Pressable>
+						</View>
+						<View style={styles.cryptoPriceTextContainer}>
+							<Text style={styles.cryptoPriceText}>${cryptoPrices[index]}</Text>
+						</View>
+						<View style={styles.cryptoPercentChangeContainer}>
+							{percentChange[index] >= 0 ? (
+								<Text style={styles.percentChangeTextPositive}>
+									{percentChange[index]}%
+								</Text>
+							) : (
+								<Text style={styles.percentChangeTextNegative}>
+									{percentChange[index]}%
+								</Text>
+							)}
+						</View>
 					</View>
 				</View>
 			));
@@ -220,9 +248,15 @@ const styles = StyleSheet.create({
 		flex: 1,
 		alignSelf: "stretch",
 	},
+	rowContainer: {
+		// borderTopWidth: 1,
+		marginHorizontal: "5%",
+		borderBottomWidth: 0.2,
+		marginBottom: "5%",
+	},
 	row: {
 		flexDirection: "row",
-		alignSelf: "stretch",
+		flex: 1,
 	},
 	inputContainer: {
 		flexDirection: "row",
@@ -259,19 +293,33 @@ const styles = StyleSheet.create({
 		color: "white",
 	},
 	cryptoListContainer: {
-		alignSelf: "center",
+		alignSelf: "stretch",
+		// marginLeft: "20%",
+		// borderWidth: 1,
 	},
 	cryptoTextContainer: {
-		alignSelf: "stretch",
+		// alignSelf: "flex-start",
+		// borderWidth: 1,
+		marginBottom: "5%",
+		width: "40%",
+	},
+	cryptoTextSubContainer: {
+		alignSelf: "flex-start",
 		padding: 5,
 		backgroundColor: "black",
 		borderRadius: 5,
-		marginBottom: "5%",
-		justifyContent: "center",
 	},
 	cryptoPriceTextContainer: {
 		alignSelf: "stretch",
-		padding: 10,
+		alignItems: "center",
+		// borderWidth: 1,
+		padding: 5,
+	},
+	cryptoPercentChangeContainer: {
+		position: "absolute",
+		right: 0,
+		alignItems: "center",
+		padding: 5,
 	},
 	cryptoText: {
 		color: "white",
@@ -280,6 +328,14 @@ const styles = StyleSheet.create({
 		fontSize: 20,
 	},
 	cryptoPriceText: {
+		fontSize: 20,
+	},
+	percentChangeTextPositive: {
+		color: "green",
+		fontSize: 20,
+	},
+	percentChangeTextNegative: {
+		color: "red",
 		fontSize: 20,
 	},
 });
