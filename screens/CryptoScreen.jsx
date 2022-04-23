@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
 	},
 	inputContainer: {
 		flexDirection: "row",
-		marginBottom: "10%",
+		marginBottom: "7.5%",
 		width: "80%",
 	},
 	buttonsRow: {
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
 		padding: "5%",
 		borderRadius: 5,
 		backgroundColor: "black",
-		marginBottom: "5%",
+		marginVertical: "2.5%",
 		marginHorizontal: "5%",
 	},
 	input: {
@@ -294,7 +294,6 @@ const styles = StyleSheet.create({
 	},
 	cryptoListContainer: {
 		alignSelf: "stretch",
-		// marginLeft: "20%",
 		// borderWidth: 1,
 	},
 	cryptoTextContainer: {

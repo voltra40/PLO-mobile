@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import { auth, firebase } from "../firebase";
 import { useNavigation } from "@react-navigation/native";
-import { Ionicons } from "@expo/vector-icons";
 
 const MacroScreen = () => {
 	const [loading, setLoading] = useState(true);
@@ -73,7 +72,6 @@ const MacroScreen = () => {
 				total.fat += Number(meal.fat);
 			});
 		}
-		// console.log("total:", total);
 		return total;
 	};
 

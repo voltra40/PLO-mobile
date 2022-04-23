@@ -1,4 +1,3 @@
-// import { NavigationRouteContext } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import {
@@ -65,7 +64,7 @@ const LoginScreen = () => {
 
 	return (
 		<KeyboardAvoidingView style={styles.container} behavior="padding">
-			<Text style={styles.title}>PLO</Text>
+			<Text style={styles.title}>Personal Life Organizer</Text>
 			<View style={styles.inputContainer}>
 				<TextInput
 					placeholder="Email"
@@ -100,16 +99,20 @@ const styles = StyleSheet.create({
 		flex: 1,
 		alignItems: "center",
 		justifyContent: "center",
+		backgroundColor: "white",
 	},
 	title: {
+		textAlign: "center",
 		fontSize: 40,
 		fontWeight: "bold",
 	},
 	inputContainer: {
+		width: "70%",
 		marginTop: "10%",
 	},
 	input: {
-		backgroundColor: "white",
+		alignSelf: "stretch",
+		backgroundColor: "#ECECEC",
 		borderRadius: 5,
 		margin: 5,
 		padding: "5%",

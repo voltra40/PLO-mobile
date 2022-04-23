@@ -12,6 +12,7 @@ import Transactions from "../screens/Transactions";
 import Stats from "../screens/Stats";
 import Meals from "../screens/MealScreen";
 import HabitLandingPage from "../screens/HabitLandingPage";
+import SleepCalculator from "../screens/SleepCalculator";
 
 export default function Navigation() {
 	return <RootNavigator />;
@@ -46,6 +47,11 @@ function RootNavigator() {
 			<Stack.Screen
 				name="Habits"
 				component={HabitScreen}
+				options={{ headerShown: false }}
+			/>
+			<Stack.Screen
+				name="Sleep Calculator"
+				component={SleepCalculator}
 				options={{ headerShown: false }}
 			/>
 		</Stack.Navigator>
