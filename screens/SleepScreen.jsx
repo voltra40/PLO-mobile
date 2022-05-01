@@ -11,7 +11,6 @@ import { useNavigation } from "@react-navigation/native";
 import { auth, firebase } from "../firebase";
 import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
-import { PickerItem } from "react-native/Libraries/Components/Picker/Picker";
 
 const SleepScreen = () => {
 	const navigation = useNavigation();

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react"
 import {
 	SafeAreaView,
 	StyleSheet,
@@ -9,67 +9,80 @@ import {
 	Pressable,
 	ScrollView,
 	Keyboard,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { auth, firebase } from "../firebase";
-import { Ionicons } from "@expo/vector-icons";
-import * as Haptics from "expo-haptics";
+} from "react-native"
+import {useNavigation} from "@react-navigation/native"
+import {auth, firebase} from "../firebase"
+import {Ionicons} from "@expo/vector-icons"
+import * as Haptics from "expo-haptics"
 
-const Meals = ({ route }) => {
-	const [loading, setLoading] = useState(true);
-	const [reload, setReload] = useState(false);
+const Meals = ({route}) => {
+	const [loading, setLoading] = useState(true)
+	const [reload, setReload] = useState(false)
 
-	const [meal, setMeal] = useState("");
+	const [meal, setMeal] = useState("")
 
 	const [macroInputRows, setMacroInputRows] = useState([
-		{ calories: 0.0, fat: 0.0, carbs: 0.0, protein: 0.0 },
-	]);
+		{calories: 0.0, fat: 0.0, carbs: 0.0, protein: 0.0},
+	])
 
-	const [mealNames, setMealNames] = useState([]);
-	const [mealData, setMealData] = useState([]);
+	const [mealNames, setMealNames] = useState([])
+	const [mealData, setMealData] = useState([])
 
-	const navigation = useNavigation();
+	const navigation = useNavigation()
 
-	const macros = route.params.macros;
+	const macros = route.params.macros
 
-	const day = Object.keys(macros)[0];
+	const day = Object.keys(macros)[0]
 
-	const user = auth.currentUser;
+	const user = auth.currentUser
 	const macroRef = firebase
 		.firestore()
 		.collection("users")
 		.doc(user.uid)
 		.collection("macros")
-		.doc(day);
+		.doc(day)
 
 	const back = () => {
-		navigation.navigate("Root", { screen: "Macros" });
-	};
+		navigation.navigate("Root", {screen: "Macros"})
+	}
 
 	useEffect(() => {
-		return macroRef.onSnapshot((doc) => {
-			setMealNames(Object.keys(doc.data()));
-			setMealData(doc.data());
-			setLoading(false);
-		});
-	}, [reload]);
+		getData()
+	}, [reload])
+
+	const getData = () => {
+		macroRef
+			.get()
+			.then((doc) => {
+				if (doc.exists) {
+					setMealNames(Object.keys(doc.data()))
+					setMealData(doc.data())
+				} else {
+					console.log("no such doc")
+				}
+			})
+			.then(() => {
+				setLoading(false)
+			})
+			.catch((err) => console.log("error getting doc:", err))
+	}
 
 	const addMeal = () => {
 		if (meal !== "") {
-			setLoading(true);
+			setLoading(true)
 
 			// totals
-			let calories = 0.0;
-			let fat = 0.0;
-			let carbs = 0.0;
-			let protein = 0.0;
+			let calories = 0.0
+			let fat = 0.0
+			let carbs = 0.0
+			let protein = 0.0
 
 			// get total from every ingredient in meal
 			for (let ingredient of macroInputRows) {
-				calories += Math.round(ingredient.calories);
-				fat += Math.round(ingredient.fat);
-				carbs += Math.round(ingredient.carbs);
-				protein += Math.round(ingredient.protein);
+				calories += Math.round(ingredient.calories)
+				fat += Math.round(ingredient.fat)
+				carbs += Math.round(ingredient.carbs)
+				protein += Math.round(ingredient.protein)
 			}
 
 			macroRef
@@ -82,36 +95,36 @@ const Meals = ({ route }) => {
 					},
 				})
 				.then(() => {
-					console.log(`added new meal: ${meal}`);
-					setMeal("");
 					// clean up
+					setMeal("")
 					setMacroInputRows([
-						{ calories: 0.0, fat: 0.0, carbs: 0.0, protein: 0.0 },
-					]);
-					Keyboard.dismiss();
-					setLoading(false);
+						{calories: 0.0, fat: 0.0, carbs: 0.0, protein: 0.0},
+					])
+					Keyboard.dismiss()
+					setReload((reload) => !reload)
+					console.log(`added new meal: ${meal}`)
 				})
-				.catch((err) => console.log(err));
+				.catch((err) => console.log(err))
 		}
-	};
+	}
 
 	const addInput = () => {
 		setMacroInputRows([
 			...macroInputRows,
-			{ calories: 0.0, fat: 0.0, carbs: 0.0, protein: 0.0 },
-		]);
-		setReload(!reload);
-		console.log("macroInputRows:", macroInputRows);
-	};
+			{calories: 0.0, fat: 0.0, carbs: 0.0, protein: 0.0},
+		])
+		setReload((reload) => !reload)
+		console.log("macroInputRows:", macroInputRows)
+	}
 
 	const deleteInput = (index) => {
-		console.log("delete");
-		let copy = macroInputRows;
-		copy.splice(index, 1);
-		setMacroInputRows(copy);
-		setReload(!reload);
-		console.log("rows:", macroInputRows);
-	};
+		console.log("delete")
+		let copy = macroInputRows
+		copy.splice(index, 1)
+		setMacroInputRows(copy)
+		setReload((reload) => !reload)
+		console.log("rows:", macroInputRows)
+	}
 
 	function MacroInputs() {
 		return macroInputRows.map((elem, index) => (
@@ -150,41 +163,42 @@ const Meals = ({ route }) => {
 					</TouchableOpacity>
 				)}
 			</View>
-		));
+		))
 	}
 
 	const deleteMeal = (elem) => {
-		setLoading(true);
-		console.log("elem:", elem);
-		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+		setLoading(true)
+		console.log("elem:", elem)
+		Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
 		macroRef
-			.update({ [elem]: firebase.firestore.FieldValue.delete() })
-			.then(() => console.log(elem, "deleted"), setLoading(false))
-			.catch((error) => alert(error.message));
-	};
+			.update({[elem]: firebase.firestore.FieldValue.delete()})
+			.then(() => {
+				console.log(elem, "deleted")
+				setReload((reload) => !reload)
+			})
+			.catch((err) => console.log(err))
+	}
 
 	function Meals() {
-		if (!loading) {
-			return mealNames.sort().map((elem, index) => (
-				<View style={styles.mealContainer} key={index}>
-					<Pressable onLongPress={() => deleteMeal(elem)}>
-						<Text style={styles.mealText}>{elem}</Text>
-					</Pressable>
-					<View style={styles.row}>
-						<Text style={styles.detailsText}>
-							calories: {mealData[elem].calories},{" "}
-						</Text>
-						<Text style={styles.detailsText}>fat: {mealData[elem].fat}g, </Text>
-						<Text style={styles.detailsText}>
-							carbs: {mealData[elem].carbs}g,{" "}
-						</Text>
-						<Text style={styles.detailsText}>
-							protein: {mealData[elem].protein}g
-						</Text>
-					</View>
+		return mealNames.sort().map((elem, index) => (
+			<View style={styles.mealContainer} key={index}>
+				<Pressable onLongPress={() => deleteMeal(elem)}>
+					<Text style={styles.mealText}>{elem}</Text>
+				</Pressable>
+				<View style={styles.row}>
+					<Text style={styles.detailsText}>
+						calories: {mealData[elem].calories},{" "}
+					</Text>
+					<Text style={styles.detailsText}>fat: {mealData[elem].fat}g, </Text>
+					<Text style={styles.detailsText}>
+						carbs: {mealData[elem].carbs}g,{" "}
+					</Text>
+					<Text style={styles.detailsText}>
+						protein: {mealData[elem].protein}g
+					</Text>
 				</View>
-			));
-		}
+			</View>
+		))
 	}
 
 	return (
@@ -220,10 +234,10 @@ const Meals = ({ route }) => {
 				</View>
 			)}
 		</SafeAreaView>
-	);
-};
+	)
+}
 
-export default Meals;
+export default Meals
 
 const styles = StyleSheet.create({
 	container: {
@@ -305,4 +319,4 @@ const styles = StyleSheet.create({
 	detailsText: {
 		fontSize: 15,
 	},
-});
+})
